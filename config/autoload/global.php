@@ -29,12 +29,12 @@ return [
         'use_cookies' => true,
         'cookie_secure' => false, // Set to true if using HTTPS
         'cookie_httponly' => true,
-        'name' => 'BhutanPostSession',
+        'name' => 'MythimphuSession',
     ],
     'session_storage' => [
         'type' => SessionArrayStorage::class,
     ],
-    'static_salt' => 'BhutanPost-MONALERP*BTN@2022(TPHU)#AICT',
+    'static_salt' => 'Mythimphu*BTN@2026(TPHU)#A-ICT',
     'ditt_api_census'    => 'http://api.censusditt.bt/final_DCRC_API/',
     
     // RMA Domestic Payment API Configuration
