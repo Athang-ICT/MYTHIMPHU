@@ -201,26 +201,21 @@ class AjaxresponseController extends AbstractActionController
     {
         // Assuming $referenceValue is the value received from the AJAX request
         $referenceValue =$this->params()->fromRoute('id');
-		//error_log("Received reference value: $referenceValue");
-        //echo  $referenceValue;
+//echo  $referenceValue;
         // Assuming $yourModel is an instance of your model class
         $debitAmount = $this->getDefinedTable(Accounts\TransactiondetailTable::class)->getColumn($referenceValue,'debit');
 
 		//echo  $debitAmount;exit;
         // Return the debit amount as JSON
         return new JsonModel(['debit' => $debitAmount]);
-		//error_log("Received reference value: $referenceValue");
-		// Code to generate JSON response
-		error_log("JSON Response: " . json_encode($debitAmount));
-
-    }
+// Code to generate JSON response
+}
 	/*GET DEBIT AMOUNT BASED ON THE REF-NO*/
 	public function getdebitamountAction()
     {
         // Assuming $referenceValue is the value received from the AJAX request
         $referenceValue =$this->params()->fromRoute('id');
-		//error_log("Received reference value: $referenceValue");
-        //echo  $referenceValue;
+//echo  $referenceValue;
         // Assuming $yourModel is an instance of your model class
         $creditAmount = $this->getDefinedTable(Accounts\TransactiondetailTable::class)->getColumn($referenceValue,'credit');
 

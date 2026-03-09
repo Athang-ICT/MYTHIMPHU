@@ -58,8 +58,7 @@ class SSOService
                 }
             }
         } catch (\Exception $e) {
-            error_log('[SSO] Error loading OpenID configuration: ' . $e->getMessage());
-            throw $e;
+throw $e;
         }
     }
 
@@ -90,9 +89,7 @@ class SSOService
         }
 
         $url = $this->config['openid_config']['authorization_endpoint'] . '?' . http_build_query($params);
-        error_log('[SSO] Full authorization URL (with state via HTTPS): ' . $url);
-        
-        return $url;
+return $url;
     }
 
     public function generatePkceParameters(): array
@@ -219,8 +216,7 @@ class SSOService
             $this->ensureOpenIdConfigLoaded();
         } catch (\Exception $e) {
             // Log error but don't fail - OpenID config will be loaded on first use
-            error_log('[SSO] Could not preload OpenID config: ' . $e->getMessage());
-        }
+}
 
         return $this->config;
     }

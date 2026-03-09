@@ -58,11 +58,7 @@ class PaymentTransactionTable
             'notes' => $transaction->getNotes(),
         ];
 
-        error_log("=== SAVING PAYMENT TRANSACTION ===");
-        error_log("remitter_cid value being saved: " . ($data['remitter_cid'] ?? 'NULL'));
-        error_log("Full data: " . json_encode($data));
-
-        if ($transaction->getId()) {
+if ($transaction->getId()) {
             $this->tableGateway->update($data, ['id' => $transaction->getId()]);
             return $transaction->getId();
         } else {

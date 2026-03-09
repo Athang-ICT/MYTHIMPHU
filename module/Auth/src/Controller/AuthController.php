@@ -219,20 +219,14 @@ class AuthController extends AbstractActionController
         }
         if ($request->isPost()) {
             // Debug logging
-            error_log("Registration POST - Step: " . $step);
-            error_log("Post data step: " . ($data['step'] ?? 'not set'));
-            error_log("Session bfsTxnId: " . ($session->bfsTxnId ?? 'not set'));
-
-            // STEP 1: Initial Registration Form Submission
+// STEP 1: Initial Registration Form Submission
             if ($step == '1' || empty($session->bfsTxnId)) {
-                error_log("Going to handlePaymentAuthorization");
-                return $this->handlePaymentAuthorization($data, $newsId, $session);
+return $this->handlePaymentAuthorization($data, $newsId, $session);
             }
             
             // STEP 2: OTP Verification and Debit
             if ($step == '2' && !empty($session->bfsTxnId)) {
-                error_log("Going to handlePaymentDebit");
-                return $this->handlePaymentDebit($data, $session);
+return $this->handlePaymentDebit($data, $session);
             }
         }
         
@@ -255,8 +249,7 @@ class AuthController extends AbstractActionController
     {
         try {
             if (! $this->hasPaymentDependencies()) {
-                error_log('Payment registration dependencies missing: RmaPaymentService or PaymentTransactionTable not configured.');
-                $this->flashMessenger()->addMessage('error^Payment service is temporarily unavailable. Please contact administrator.');
+$this->flashMessenger()->addMessage('error^Payment service is temporarily unavailable. Please contact administrator.');
                 return $this->redirect()->toRoute('auth', ['action' => 'registration']);
             }
 
@@ -280,10 +273,6 @@ class AuthController extends AbstractActionController
             $merchantId = trim((string)($config['rma_api']['merchant_id'] ?? ''));
             
             // Log payment request details
-            error_log("Registration Payment Authorization Request:");
-            error_log("Merchant ID: " . $merchantId);
-            error_log("User: {$data['name']} ({$data['cid']})");
-            error_log("Amount: 100.00");
             
             $paymentDesc = "Registration Payment - {$data['name']} ({$data['cid']})";
             $authResponse = $this->rmaPaymentService->authorizeTransaction(
@@ -293,9 +282,7 @@ class AuthController extends AbstractActionController
             );
 
             // Log full response for debugging
-            error_log("RMA Authorization Response: " . json_encode($authResponse));
-
-            $authStatus = strtoupper((string)($authResponse['status'] ?? $authResponse['authorisation_status'] ?? ''));
+$authStatus = strtoupper((string)($authResponse['status'] ?? $authResponse['authorisation_status'] ?? ''));
             $authCode = $authResponse['bfs_responseCode']
                 ?? $authResponse['bfs_response_code']
                 ?? null;
@@ -315,9 +302,7 @@ class AuthController extends AbstractActionController
                     ?? 'Payment authorization failed';
                 $errorDetails = $authCode ? " (Code: {$authCode})" : "";
                 
-                error_log("Payment authorization FAILED: {$errorMsg}{$errorDetails}");
-                
-                $this->flashMessenger()->addMessage("error^Payment authorization failed: {$errorMsg}{$errorDetails}");
+$this->flashMessenger()->addMessage("error^Payment authorization failed: {$errorMsg}{$errorDetails}");
                 return $this->redirect()->toRoute('auth', ['action' => 'registration']);
             }
 
@@ -336,11 +321,7 @@ class AuthController extends AbstractActionController
             ];
 
             // Save payment transaction to database
-            error_log("=== PAYMENT TRANSACTION CID DEBUG ===");
-            error_log("CID from form data: " . ($data['cid'] ?? 'NOT SET'));
-            error_log("Full form data: " . json_encode($data->toArray()));
-            
-            $transaction = new \DomesticPayment\Model\PaymentTransaction();
+$transaction = new \DomesticPayment\Model\PaymentTransaction();
             $transaction->setMerchantId($merchantId)
                 ->setPaymentDesc($paymentDesc)
                 ->setTxnAmount('1.00')
@@ -355,14 +336,10 @@ class AuthController extends AbstractActionController
                 ->setCreatedAt(new DateTime())
                 ->setUpdatedAt(new DateTime());
 
-            error_log("CID being saved to transaction: " . $transaction->getRemitterCid());
-            $txnId = $this->paymentTransactionTable->savePaymentTransaction($transaction);
-            error_log("Transaction saved with ID: " . $txnId);
-            $session->txnId = $txnId; // Store transaction ID in session
+$txnId = $this->paymentTransactionTable->savePaymentTransaction($transaction);
+$session->txnId = $txnId; // Store transaction ID in session
             
-            error_log("Payment transaction saved with ID: " . $txnId);
-
-            // Proceed to account inquiry (only show user-facing messages after inquiry)
+// Proceed to account inquiry (only show user-facing messages after inquiry)
             return $this->handleAccountInquiry($data, $session);
 
         } catch (\Exception $e) {
@@ -384,9 +361,7 @@ class AuthController extends AbstractActionController
                 $session->bfsTxnId
             );
 
-            error_log("Account Inquiry Full Response: " . json_encode($inquiryResponse));
-            
-            // Map API fields (supports snake_case and camelCase)
+// Map API fields (supports snake_case and camelCase)
             $respCode = $inquiryResponse['bfs_responseCode']
                 ?? $inquiryResponse['bfs_response_code']
                 ?? $inquiryResponse['response_code']
@@ -399,9 +374,7 @@ class AuthController extends AbstractActionController
                 ?? $inquiryResponse['account_inquiry_status']
                 ?? null;
 
-            error_log("Account Inquiry - Code: {$respCode}, Desc: {$respDesc}, Status: {$enquiryStatus}");
-
-            $codeOk = ($respCode === '00');
+$codeOk = ($respCode === '00');
             $statusOk = ($enquiryStatus && stripos($enquiryStatus, 'SUCCESS') !== false);
 
             if (!$inquiryResponse || (!($codeOk || $statusOk))) {
@@ -409,14 +382,11 @@ class AuthController extends AbstractActionController
                 if ($respCode) {
                     $displayMsg .= " (Code: {$respCode})";
                 }
-                error_log("Account Inquiry BLOCKED - Account verification failed. Code: {$respCode}, Desc: {$respDesc}, Status: {$enquiryStatus}");
-                $this->flashMessenger()->addMessage("error^Account verification failed: {$displayMsg}. Please verify your bank account details.");
+$this->flashMessenger()->addMessage("error^Account verification failed: {$displayMsg}. Please verify your bank account details.");
                 return $this->redirect()->toRoute('auth', ['action' => 'registration']);
             }
 
-            error_log("Account Inquiry PASSED - Proceeding to OTP");
-
-            // Update payment transaction with account details
+// Update payment transaction with account details
             if (!empty($session->txnId)) {
                 $transaction = $this->paymentTransactionTable->getPaymentTransaction($session->txnId);
                 if ($transaction) {
@@ -428,8 +398,7 @@ class AuthController extends AbstractActionController
                         ->setUpdatedAt(new DateTime());
                     
                     $this->paymentTransactionTable->savePaymentTransaction($transaction);
-                    error_log("Payment transaction updated after inquiry - Status: inquired");
-                }
+}
             }
 
             $this->flashMessenger()->addMessage("success^Account verified! Please check your phone for OTP.");
@@ -467,16 +436,12 @@ class AuthController extends AbstractActionController
             }
 
             // Process debit with OTP
-            error_log("Processing debit - OTP: " . $data['otp'] . ", TxnId: " . $session->bfsTxnId);
-            
-            $debitResponse = $this->rmaPaymentService->debitTransaction(
+$debitResponse = $this->rmaPaymentService->debitTransaction(
                 $data['otp'],
                 $session->bfsTxnId
             );
 
-            error_log("Debit Response: " . json_encode($debitResponse));
-
-            // Map fields (snake_case vs camelCase) and determine success
+// Map fields (snake_case vs camelCase) and determine success
             $debitRespCode = $debitResponse['debit_response_code']
                 ?? $debitResponse['bfs_responseCode']
                 ?? $debitResponse['bfs_response_code']
@@ -496,9 +461,7 @@ class AuthController extends AbstractActionController
                 $errorMsg = $debitRespMsg ?? $accountDebitStatus ?? ($debitResponse['message'] ?? 'Payment failed');
                 $errorCode = $debitRespCode ?? '';
                 
-                error_log("Debit FAILED: {$errorMsg} (Code: {$errorCode})");
-                
-                $displayMsg = $errorMsg;
+$displayMsg = $errorMsg;
                 if ($errorCode) {
                     $displayMsg .= " (Error Code: {$errorCode})";
                 }
@@ -510,9 +473,7 @@ class AuthController extends AbstractActionController
                 ], ['query' => ['step' => '2']]);
             }
             
-            error_log("Debit SUCCESS! TxnId: " . ($debitResponse['txnId'] ?? 'N/A'));
-
-            // Update payment transaction with final status
+// Update payment transaction with final status
             if (!empty($session->txnId)) {
                 $transaction = $this->paymentTransactionTable->getPaymentTransaction($session->txnId);
                 if ($transaction) {
@@ -523,8 +484,7 @@ class AuthController extends AbstractActionController
                         ->setUpdatedAt(new DateTime());
                     
                     $this->paymentTransactionTable->savePaymentTransaction($transaction);
-                    error_log("Payment transaction completed and saved");
-                }
+}
             }
 
             // Payment successful! Now create user account
@@ -548,8 +508,6 @@ class AuthController extends AbstractActionController
                 $session->regData = $regData; // keep session in sync
             }
             
-            error_log("=== COMPLETE REGISTRATION DEBUG ===");
-            error_log("User data: " . json_encode($regData));
 
             // Generate a random password
             $staticSalt = $this->password()->getStaticSalt();
@@ -562,9 +520,7 @@ class AuthController extends AbstractActionController
             $dynamicSalt = bin2hex(random_bytes(4));
             $hashedPassword = sha1($staticSalt . $randomPassword . $dynamicSalt);
             
-            error_log("Generated password: " . $randomPassword);
-
-            // Create user account
+// Create user account
             $userData = [
                 'name'         => $regData['name'],
                 'cid'          => $regData['cid'],
@@ -580,15 +536,11 @@ class AuthController extends AbstractActionController
                 'modified'     => date('Y-m-d H:i:s')
             ];
 
-            error_log("checking for news id..." . json_encode($regData));
-            $userId = $this->getDefinedTable(Administration\UsersTable::class)->save($userData);
-            error_log("User ID created: " . $userId);
-
-            if ($userId > 0) {
+$userId = $this->getDefinedTable(Administration\UsersTable::class)->save($userData);
+if ($userId > 0) {
                 // Create subscription if newsId is provided
                 if (!empty($regData['newsId'])) {
-                    error_log("Creating subscription for newsId: " . $regData['newsId']);
-                    $start = date('Y-m-d H:i:s');
+$start = date('Y-m-d H:i:s');
                     $end   = date('Y-m-d H:i:s', strtotime('+1 year', strtotime($start)));
                     
                     $subscribeData = [
@@ -603,8 +555,7 @@ class AuthController extends AbstractActionController
                     ];
 
                     $this->getDefinedTable(News\SubcribeTable::class)->save($subscribeData);
-                    error_log("Subscription created successfully");
-                }
+}
                 
                 // Send credentials email
                 $message = "
@@ -628,30 +579,23 @@ class AuthController extends AbstractActionController
                     'message'  => $message,
                     'cc_array' => [],
                 );
-                error_log("Sending credentials email to: " . $regData['email']);
-                try {
+try {
                     $this->EmailPlugin()->sendmail($mail);
-                    error_log("Email sent successfully!");
-                } catch (\Exception $e) {
-                    error_log("Email send failed: " . $e->getMessage());
-                }
+} catch (\Exception $e) {
+}
 
                 // Clear session
                 $this->clearRegistrationSession($session);
                 
-                error_log("Registration completed! Redirecting to login...");
-                $this->flashMessenger()->addMessage("success^Registration and payment successful! Your login credentials have been sent to your email.");
+$this->flashMessenger()->addMessage("success^Registration and payment successful! Your login credentials have been sent to your email.");
                 return $this->redirect()->toRoute('auth', ['action' => 'login']);
 
             } else {
-                error_log("ERROR: Failed to create user - userId is 0 or false");
-                $this->flashMessenger()->addMessage("error^Failed to create user account.");
+$this->flashMessenger()->addMessage("error^Failed to create user account.");
                 return $this->redirect()->toRoute('auth', ['action' => 'registration']);
             }
 
         } catch (\Exception $e) {
-            error_log("EXCEPTION in completeRegistration: " . $e->getMessage());
-            error_log("Stack trace: " . $e->getTraceAsString());
             $this->flashMessenger()->addMessage("error^Registration error: " . $e->getMessage());
             return $this->redirect()->toRoute('auth', ['action' => 'registration']);
         }
@@ -818,19 +762,14 @@ class AuthController extends AbstractActionController
         $state = $this->params()->fromQuery('state');
         $error = $this->params()->fromQuery('error');
 
-        error_log('[SSO] Callback hit code_present=' . (! empty($code) ? 'yes' : 'no') . ' state=' . ($state ?? 'none') . ' session_state=' . ($this->session->state ?? 'none') . ' session_id=' . session_id());
-
-        if ($error) {
+if ($error) {
             return new ViewModel([
                 'error' => 'SSO Authentication failed: ' . $error,
             ]);
         }
         // Debug: dump all session variables
-        error_log('[SSO] Session dump: ' . print_r(iterator_to_array($this->session->getIterator()), true));
-
-        if (!$state || $state !== $this->session->state) {
-            error_log('[SSO] Callback state mismatch incoming=' . ($state ?? 'none') . ' session=' . ($this->session->state ?? 'none') . ' session_id=' . session_id());
-            return new ViewModel([
+if (!$state || $state !== $this->session->state) {
+return new ViewModel([
                 'error' => 'Invalid state parameter. Possible CSRF attack.',
             ]);
         }

@@ -75,15 +75,6 @@ class RmaPaymentService
             'bfs_remitterBankId' => $remitterBankId,
             'bfs_bfsTxnId' => $bfsTxnId,
         ];
-
-        // Log exact payload for debugging
-        error_log("=== Account Inquiry Request Payload ===");
-        error_log("Account Number: " . $remitterAccNo);
-        error_log("Bank ID: " . $remitterBankId);
-        error_log("BFS Transaction ID: " . $bfsTxnId);
-        error_log("Full Payload JSON: " . json_encode($payload));
-        error_log("=======================================");
-
         return $this->sendRequest($endpoint, $payload, 'Account Inquiry');
     }
 
@@ -139,22 +130,10 @@ class RmaPaymentService
 
             // Set request body
             $this->httpClient->setRawBody(Json::encode($payload));
-
-            // Debug: Log request details
-            error_log("RMA API Request - $action");
-            error_log("URL: $url");
-            error_log("Payload: " . Json::encode($payload));
-            error_log("JWT Token Length: " . strlen($this->jwtToken));
-
             $response = $this->httpClient->send();
 
             $statusCode = $response->getStatusCode();
             $body = $response->getBody();
-
-            // Debug: Log response
-            error_log("RMA API Response - $action");
-            error_log("Status Code: $statusCode");
-            error_log("Response Body: $body");
 
             // Log request details
             if ($this->logger) {
@@ -178,9 +157,6 @@ class RmaPaymentService
                     $response = $this->httpClient->send();
                     $statusCode = $response->getStatusCode();
                     $body = $response->getBody();
-                    error_log("RMA API Response (retry) - $action");
-                    error_log("Status Code: $statusCode");
-                    error_log("Response Body: $body");
                     if ($statusCode === 200 || $statusCode === 201) {
                         return Json::decode($body, Json::TYPE_ARRAY);
                     }

@@ -252,17 +252,14 @@ class NewspaperController extends AbstractActionController
 			$merchantId = trim((string)($config['rma_api']['merchant_id'] ?? ''));
 
 			// Authorize payment
-			error_log('Renewal Payment Authorization - User: ' . $this->_author);
-			$paymentDesc = 'Subscription Renewal - User ' . $this->_author;
+$paymentDesc = 'Subscription Renewal - User ' . $this->_author;
 			$authResponse = $this->rmaPaymentService->authorizeTransaction(
 				$merchantId,
 				$paymentDesc,
 				'1.00' // Renewal fee
 			);
 
-			error_log('RMA Authorization Response: ' . json_encode($authResponse));
-
-			$authStatus = strtoupper((string)($authResponse['status'] ?? $authResponse['authorisation_status'] ?? ''));
+$authStatus = strtoupper((string)($authResponse['status'] ?? $authResponse['authorisation_status'] ?? ''));
 			$authCode = $authResponse['bfs_responseCode']
 				?? $authResponse['bfs_response_code']
 				?? null;
@@ -273,8 +270,7 @@ class NewspaperController extends AbstractActionController
 					?? $authResponse['message']
 					?? 'Payment authorization failed';
 				$errorSuffix = $authCode ? ' (Code: ' . $authCode . ')' : '';
-				error_log('Payment authorization FAILED: ' . $errorMsg);
-				$this->flashMessenger()->addMessage('error^Payment authorization failed: ' . $errorMsg . $errorSuffix);
+$this->flashMessenger()->addMessage('error^Payment authorization failed: ' . $errorMsg . $errorSuffix);
 				return $this->redirect()->toRoute('newspaper', ['action' => 'renewsubscription']);
 			}
 
@@ -309,8 +305,7 @@ class NewspaperController extends AbstractActionController
 			return $this->handleRenewalAccountInquiry($data, $session);
 
 		} catch (\Exception $e) {
-			error_log('Renewal Payment Error: ' . $e->getMessage());
-			$this->flashMessenger()->addMessage('error^Payment error: ' . $e->getMessage());
+$this->flashMessenger()->addMessage('error^Payment error: ' . $e->getMessage());
 			return $this->redirect()->toRoute('newspaper', ['action' => 'renewsubscription']);
 		}
 	}
@@ -327,9 +322,7 @@ class NewspaperController extends AbstractActionController
 				$session->bfsTxnId
 			);
 
-			error_log('Account Inquiry Response: ' . json_encode($inquiryResponse));
-
-			// Map API fields
+// Map API fields
 			$respCode = $inquiryResponse['bfs_responseCode']
 				?? $inquiryResponse['bfs_response_code']
 				?? $inquiryResponse['response_code']
@@ -350,8 +343,7 @@ class NewspaperController extends AbstractActionController
 				if ($respCode) {
 					$displayMsg .= " (Code: {$respCode})";
 				}
-				error_log('Account Inquiry FAILED: ' . $displayMsg);
-				$this->flashMessenger()->addMessage('error^Account verification failed: ' . $displayMsg);
+$this->flashMessenger()->addMessage('error^Account verification failed: ' . $displayMsg);
 				return $this->redirect()->toRoute('newspaper', ['action' => 'renewsubscription']);
 			}
 
@@ -376,8 +368,7 @@ class NewspaperController extends AbstractActionController
 			return $this->redirect()->toRoute('newspaper', ['action' => 'renewsubscription']);
 
 		} catch (\Exception $e) {
-			error_log('Account Inquiry Error: ' . $e->getMessage());
-			$this->flashMessenger()->addMessage('error^Account inquiry error: ' . $e->getMessage());
+$this->flashMessenger()->addMessage('error^Account inquiry error: ' . $e->getMessage());
 			return $this->redirect()->toRoute('newspaper', ['action' => 'renewsubscription']);
 		}
 	}
@@ -405,9 +396,7 @@ class NewspaperController extends AbstractActionController
 				$session->bfsTxnId
 			);
 
-			error_log('Debit Response: ' . json_encode($debitResponse));
-
-			// Map fields
+// Map fields
 			$debitRespCode = $debitResponse['debit_response_code']
 				?? $debitResponse['bfs_responseCode']
 				?? $debitResponse['bfs_response_code']
@@ -428,8 +417,7 @@ class NewspaperController extends AbstractActionController
 				if ($debitRespCode) {
 					$errorMsg .= " (Error Code: {$debitRespCode})";
 				}
-				error_log('Debit FAILED: ' . $errorMsg);
-				$this->flashMessenger()->addMessage('error^Payment failed: ' . $errorMsg);
+$this->flashMessenger()->addMessage('error^Payment failed: ' . $errorMsg);
 				$session->step = '2';
 				return $this->redirect()->toRoute('newspaper', ['action' => 'renewsubscription']);
 			}
@@ -467,9 +455,7 @@ class NewspaperController extends AbstractActionController
 
 			$this->getDefinedTable(News\SubcribeTable::class)->save($updateData);
 
-			error_log('Subscription renewed successfully - New end date: ' . $newEndDate);
-
-			// Clear session
+// Clear session
 			unset($session->bfsTxnId);
 			unset($session->paymentDesc);
 			unset($session->accountNo);
@@ -482,8 +468,7 @@ class NewspaperController extends AbstractActionController
 			return $this->redirect()->toRoute('newspaper', ['action' => 'pdfnews']);
 
 		} catch (\Exception $e) {
-			error_log('Renewal Debit Error: ' . $e->getMessage());
-			$this->flashMessenger()->addMessage('error^Payment debit error: ' . $e->getMessage());
+$this->flashMessenger()->addMessage('error^Payment debit error: ' . $e->getMessage());
 			return $this->redirect()->toRoute('newspaper', ['action' => 'renewsubscription']);
 		}
 	}

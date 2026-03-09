@@ -327,8 +327,7 @@ class UploadController extends AbstractActionController
 			exit;
 		} else {
 			// Log error for debugging purposes and inform the user
-			error_log("File not found: " . $filePath);
-			echo "Error: File not found!";
+echo "Error: File not found!";
 		}
 	}
 }
