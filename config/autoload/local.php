@@ -27,4 +27,10 @@ return [
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         ],
 	],
+    'rma_api' => [
+        'base_url' => 'https://apipg.athang.com:8080/api/v1',
+        // Replace with actual credentials issued by Athang/RMA.
+        'merchant_id' => '',
+        'jwt_secret' => '',
+    ],
 ];

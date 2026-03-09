@@ -249,7 +249,7 @@ class NewspaperController extends AbstractActionController
 			}
 
 			$config = $this->_container->get('config');
-			$merchantId = $config['rma_api']['merchant_id'] ?? 'MERCHANT001';
+			$merchantId = trim((string)($config['rma_api']['merchant_id'] ?? ''));
 
 			// Authorize payment
 			error_log('Renewal Payment Authorization - User: ' . $this->_author);
@@ -262,10 +262,19 @@ class NewspaperController extends AbstractActionController
 
 			error_log('RMA Authorization Response: ' . json_encode($authResponse));
 
-			if (!$authResponse || $authResponse['status'] === 'FAILED') {
-				$errorMsg = $authResponse['message'] ?? 'Payment authorization failed';
+			$authStatus = strtoupper((string)($authResponse['status'] ?? $authResponse['authorisation_status'] ?? ''));
+			$authCode = $authResponse['bfs_responseCode']
+				?? $authResponse['bfs_response_code']
+				?? null;
+
+			if (!$authResponse || $authStatus === 'FAILED' || ($authCode !== null && $authCode !== '00') || empty($authResponse['bfs_bfsTxnId'])) {
+				$errorMsg = $authResponse['bfs_responseMessage']
+					?? $authResponse['bfs_response_message']
+					?? $authResponse['message']
+					?? 'Payment authorization failed';
+				$errorSuffix = $authCode ? ' (Code: ' . $authCode . ')' : '';
 				error_log('Payment authorization FAILED: ' . $errorMsg);
-				$this->flashMessenger()->addMessage('error^Payment authorization failed: ' . $errorMsg);
+				$this->flashMessenger()->addMessage('error^Payment authorization failed: ' . $errorMsg . $errorSuffix);
 				return $this->redirect()->toRoute('newspaper', ['action' => 'renewsubscription']);
 			}
 

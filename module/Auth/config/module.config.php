@@ -58,7 +58,15 @@ return [
     'controllers'     => [
         'factories' => [
             Controller\AuthController::class  => function ($container) {
-                return new Controller\AuthController( $container);
+                return new Controller\AuthController(
+                    $container,
+                    $container->has(\DomesticPayment\Service\RmaPaymentService::class)
+                        ? $container->get(\DomesticPayment\Service\RmaPaymentService::class)
+                        : null,
+                    $container->has(\DomesticPayment\Model\PaymentTransactionTable::class)
+                        ? $container->get(\DomesticPayment\Model\PaymentTransactionTable::class)
+                        : null
+                );
             },
         ],
     ],

@@ -39,9 +39,9 @@ return [
     
     // RMA Domestic Payment API Configuration
     'rma_api' => [
-        'base_url' => 'http://apipg.athang.com:8083/api/v1/swagger-ui/index.html',
-        'jwt_secret' => '', // No authentication required currently
-        'merchant_id' => 'MERCHANT001', // Replace with your actual RMA merchant ID
+        'base_url' => 'https://apipg.athang.com:8080/api/v1',
+        'jwt_secret' => getenv('RMA_JWT_TOKEN') ?: '',
+        'merchant_id' => getenv('RMA_MERCHANT_ID') ?: '',
     ],
     
 ];

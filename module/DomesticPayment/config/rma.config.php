@@ -8,7 +8,7 @@
 return [
     'rma_payment' => [
         // RMA API endpoint URL
-        'api_url' => 'http://141.148.209.255:8083/api/v1',
+        'api_url' => 'https://apipg.athang.com:8080/api/v1',
         
         // JWT Token for API authentication
         // You need to obtain this from RMA by calling /auth/login endpoint

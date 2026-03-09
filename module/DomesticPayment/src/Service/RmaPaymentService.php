@@ -43,10 +43,10 @@ class RmaPaymentService
         string $paymentDesc,
         string $txnAmount
     ): ?array {
-        $endpoint = '/payment/authorise-request';
+        $endpoint = '/domesticpg/authorise-request';
         
         $payload = [
-            'bfs_paymentDesc' => 'mythimphu',
+            'bfs_paymentDesc' => 'mythimphu.com',
             'txnAmount' => $txnAmount,
         ];
 
@@ -68,7 +68,7 @@ class RmaPaymentService
         string $remitterBankId,
         string $bfsTxnId
     ): ?array {
-        $endpoint = '/payment/account-inquiry';
+        $endpoint = '/domesticpg/account-inquiry';
         
         $payload = [
             'bfs_remitterAccNo' => $remitterAccNo,
@@ -100,7 +100,7 @@ class RmaPaymentService
         string $remitterOtp,
         string $bfsTxnId
     ): ?array {
-        $endpoint = '/payment/debit-request';
+        $endpoint = '/domesticpg/debit-request';
         
         $payload = [
             'bfs_remitterOtp' => $remitterOtp,

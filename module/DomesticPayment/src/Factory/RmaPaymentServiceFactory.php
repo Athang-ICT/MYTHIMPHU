@@ -18,7 +18,7 @@ class RmaPaymentServiceFactory implements FactoryInterface
         // Get RMA API configuration (from rma_api config key)
         $rmaConfig = $config['rma_api'] ?? [];
         
-        $apiUrl = $rmaConfig['base_url'] ?? 'http://141.148.209.255:8083/api/v1';
+        $apiUrl = $rmaConfig['base_url'] ?? 'https://apipg.athang.com:8080/api/v1';
         $jwtToken = $rmaConfig['jwt_secret'] ?? '';
 
         $httpClient = new Client();

@@ -36,10 +36,18 @@ class AuthController extends AbstractActionController
     private $ssoService;
     private $session;
     private $config;
-    public function __construct(ContainerInterface $container)
+    public function __construct(
+        ContainerInterface $container,
+        ?RmaPaymentService $rmaPaymentService = null,
+        ?PaymentTransactionTable $paymentTransactionTable = null
+    )
     {
         $this->container = $container;
         $this->dbAdapter = $this->container->get(DbAdapter::class);
+        $this->rmaPaymentService = $rmaPaymentService
+            ?? ($this->container->has(RmaPaymentService::class) ? $this->container->get(RmaPaymentService::class) : null);
+        $this->paymentTransactionTable = $paymentTransactionTable
+            ?? ($this->container->has(PaymentTransactionTable::class) ? $this->container->get(PaymentTransactionTable::class) : null);
         $this->ssoService = new SSOService($container->get('config'));
         $this->session = $this->ssoService->getSession();
         $this->config = $container->get('config');
@@ -48,6 +56,12 @@ class AuthController extends AbstractActionController
         } else {
             $this->config = $this->ssoService->initializeConfig($this->config);
         }
+    }
+
+    private function hasPaymentDependencies(): bool
+    {
+        return ($this->rmaPaymentService instanceof RmaPaymentService)
+            && ($this->paymentTransactionTable instanceof PaymentTransactionTable);
     }
 
     public function getDefinedTable($table)
@@ -240,6 +254,12 @@ class AuthController extends AbstractActionController
     private function handlePaymentAuthorization($data, $newsId, Container $session)
     {
         try {
+            if (! $this->hasPaymentDependencies()) {
+                error_log('Payment registration dependencies missing: RmaPaymentService or PaymentTransactionTable not configured.');
+                $this->flashMessenger()->addMessage('error^Payment service is temporarily unavailable. Please contact administrator.');
+                return $this->redirect()->toRoute('auth', ['action' => 'registration']);
+            }
+
             // Validate registration data
             $validationError = $this->validateRegistrationData($data);
             if ($validationError) {
@@ -257,7 +277,7 @@ class AuthController extends AbstractActionController
 
             // Authorize transaction with RMA
             $config = $this->container->get('config');
-            $merchantId = $config['rma_api']['merchant_id'] ?? 'MERCHANT001';
+            $merchantId = trim((string)($config['rma_api']['merchant_id'] ?? ''));
             
             // Log payment request details
             error_log("Registration Payment Authorization Request:");
@@ -275,13 +295,29 @@ class AuthController extends AbstractActionController
             // Log full response for debugging
             error_log("RMA Authorization Response: " . json_encode($authResponse));
 
-            if (!$authResponse || ($authResponse['status'] ?? '') === 'FAILED') {
-                $errorMsg = $authResponse['message'] ?? 'Payment authorization failed';
-                $errorDetails = isset($authResponse['bfs_responseCode']) ? " (Code: {$authResponse['bfs_responseCode']})" : "";
+            $authStatus = strtoupper((string)($authResponse['status'] ?? $authResponse['authorisation_status'] ?? ''));
+            $authCode = $authResponse['bfs_responseCode']
+                ?? $authResponse['bfs_response_code']
+                ?? null;
+            $authStatusOk = ($authStatus !== '' && strpos($authStatus, 'SUCCESS') !== false);
+            $authStatusFailed = ($authStatus !== '' && (strpos($authStatus, 'FAIL') !== false || strpos($authStatus, 'INVALID') !== false));
+
+            if (
+                !$authResponse
+                || $authStatusFailed
+                || ($authCode !== null && $authCode !== '00')
+                || ($authCode === null && !$authStatusOk)
+                || empty($authResponse['bfs_bfsTxnId'])
+            ) {
+                $errorMsg = $authResponse['bfs_responseMessage']
+                    ?? $authResponse['bfs_response_message']
+                    ?? $authResponse['message']
+                    ?? 'Payment authorization failed';
+                $errorDetails = $authCode ? " (Code: {$authCode})" : "";
                 
                 error_log("Payment authorization FAILED: {$errorMsg}{$errorDetails}");
                 
-                $this->flashMessenger()->addMessage("error^Payment authorization failed: {$errorMsg}{$errorDetails}. Please verify the merchant ID is correct in the configuration.");
+                $this->flashMessenger()->addMessage("error^Payment authorization failed: {$errorMsg}{$errorDetails}");
                 return $this->redirect()->toRoute('auth', ['action' => 'registration']);
             }
 
