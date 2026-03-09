@@ -1,0 +1,58 @@
+<?php
+/**
+ * View -- of Administration/MasterController/locationtypeAction
+ * chophel@athang.com
+ */
+	$this->headTitle($this->title);
+?>
+<?php echo $this->tabs_helper(array(422,425,428,431,434,437)); ?>
+<div class="card">
+	<div class="card-header">
+		<div class="btn-group pull-right">
+			<?php echo $this->button(2,$page);?>
+		</div>
+	</div>
+	<div class="table-responsive">
+		<table class="table card-table text-nowrap" id="dataTables">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>PIU Type</th>
+					<th>Description</th>
+					<th>Status</th>
+					<?php if($this->button(1)!=""):?>
+						<th class="no-sort no-printpdf">Action</th>
+					<?php endif;?>	
+				</tr>
+			</thead>
+			<tbody>
+			<?php $i=1+(($page-1)*20); foreach ($paginator as $row):?>
+				<tr>
+					<td><?php  echo $i++; ?></td>								       
+					<td class="fw-bold"><?php echo $row['location_type'];?></td>
+					<td><?php echo $row['description']; ?></td>
+					<td><?php echo $this->status($row['status']); ?></td>
+					<?php if($this->button(1)!=""):?>
+						<td><?php echo $this->button(1, $row['id'].'_'.$page);?></td>
+					<?php endif;?>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
+	</div>
+	<div class="card-footer d-flex align-items-center">
+		<?php echo $this->paginationControl($this->paginator,'Sliding','adm_pagination.phtml', 
+			array('route' => 'setmaster/paginator','action'=>'locationtype','id'=>'0'));?>
+	</div>
+</div>
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+$('document').ready(function(){
+	$('#dataTables').DataTable();
+});
+</script>

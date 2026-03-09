@@ -1,0 +1,398 @@
+<?php 
+/**
+ * View -- of Administration/UserController/updateAction
+ * chophel@athang.com 
+ */
+	$this->headTitle($this->title);
+?>
+<?php foreach($users as $row);?>
+<div class="row">
+	<div class="col-lg-12">
+		<div class="widget widget-box">
+			<div class="widget-header">
+				<h5 class="widget-title smaller"><i class="ace-icon fa fa-edit"></i><?php echo $this->title;?></h5>
+			</div>
+			<div class="widget-body">		
+				<form id="#form" method="post" action="<?php echo $this->url('user', array('action' => 'update')); ?>" enctype="multipart/form-data" >
+					<div class="widget-main">
+						<div class="row">
+							<input type="hidden" value="<?php echo $row['id'];?>" id="user_id" name="user_id" />
+							<div class="form-group col-lg-4">
+								<label for="cid" class="control-label">Citizen ID.</label>
+								<div class="input-group">
+									<input class="form-control" placeholder="Citizen ID" id="cid" name="cid" value="<?php echo $row['cid'];?>" autocomplete="off" required <?php echo $disabled;?> >
+									<span class="input-group-addon" id="panel"><i class="fa fa-user-o bigger-110"></i></span>
+								</div>
+								<div id="message1"></div>
+							</div>
+							<div class="form-group col-lg-4">
+								<label for="dob" class="control-label">Date of Birth:</label>
+								<div class="input-group">
+									<input class="form-control date-picker" placeholder="Select" name="dob" id="dob" type="text" value="<?php echo $row['dob'];?>" data-date-format="yyyy-mm-dd" autocomplete="off" <?php echo $disabled;?> />
+									<span class="input-group-addon"><i class="fa fa-calendar bigger-110"></i></span>
+								</div>
+							</div>
+							<div class="form-group col-lg-4">
+								<label for="name" class="control-label">Full Name</label>
+								<input class="form-control" placeholder="Full name" id="name" name="name" value="<?php echo $row['name'];?>" required <?php echo $disabled;?> >
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group col-lg-4">
+								<label for="email" class="control-label">Email</label>
+								<div class="input-group">
+									<div class="input-group-addon">@</div>
+									<input class="form-control" placeholder="Email" id="email" name="email" value="<?php echo $row['email'];?>" autocomplete="off" required >
+								</div>
+							</div>
+							<div class="form-group col-lg-4">
+								<label for="mobile" class="control-label">Mobile No.</label>
+								<div class="input-group">
+									<div class="input-group-addon">+975</div>
+									<input type="text" class="form-control" placeholder="Mobile No." id="mobile" name="mobile" value="<?php echo $row['mobile'];?>" autocomplete="off" required >
+								</div>
+							</div>		
+						</div>
+						<h5 class="header smaller blue"><i class="ace-icon fa fa-user-circle"></i> Role Permissions</h5>
+						<div class="row">
+							<div class="form-group col-lg-6">
+								<label class="control-label" for="role">Role</label>
+								<select multiple="" class="form-control" name="role[]" id="role" data-placeholder="Select" <?php echo $disabled;?> >
+									<option value=''></option>
+									<?php $role_array = !empty($row['role']) ? explode(',',$row['role']) : [];
+										foreach($this->permissionObj->getrole() as $role):?>
+										<option value="<?php echo $role['id'];?>" <?php echo (in_array($role['id'],$role_array))?'selected':'';?>>
+											<?php echo $role['role'];?>
+										</option>
+									<?php endforeach;?>
+								</select>
+							</div>
+						</div>
+						<h5 class="header smaller blue"><i class="ace-icon fa fa-map-o"></i> Adminstrative Location & Activity Permission</h5>
+						<div class="row">
+							<div class="form-group col-lg-4">
+								<label for="region" class="control-label">Posted Region</label>
+								<select id="region" name="region" class="form-control" data-placeholder="Select" required <?php echo $disabled;?> >
+									<option value=""></option>
+									<?php foreach($this->permissionObj->getregion() as $region):?>
+									<option value="<?php echo $region['id'];?>" <?php echo ($region['id']==$row['region'])?'selected':'';?>>
+										<?php echo $region['region'];?>
+									</option>
+									<?php endforeach;?>
+								</select>
+							</div>
+							<div class="form-group col-lg-4">
+								<label for="location" class="control-label">Posted Location</label>
+								<select  class="form-control" id="location" name="location" data-placeholder="Select" required <?php echo $disabled;?> >
+									<option value=""></option>
+									<?php foreach($this->permissionObj->getlocation($row['region']) as $location):?>
+									<option value="<?php echo $location['id'];?>" <?php echo ($location['id']==$row['location'])?'selected':'';?>>
+										<?php echo $location['location'];?>
+									</option>
+									<?php endforeach;?>
+								</select>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-lg-12"> 
+								<div class="widget-box">
+									<div class="widget-header widget-header-smaller">
+										<h5 class="widget-title lighter smaller">
+											<i class="fa fa-wrench"></i> Assign Activity
+										</h5>
+									</div>
+									<div class="widget-body">
+										<div class="widget-main padding-24"> 
+											<label class="ace grey">
+												<?php $activity_array = !empty($row['admin_activity']) ? explode(",", $row['admin_activity']) : [];
+													$activity_count = $this->permissionObj->getactivityCount();?>
+												<input type="checkbox" class="ace" name="selectall2" id="selectall2" value="1" <?php echo (sizeof($activity_array)==$activity_count)?'checked':'';?> <?php echo $disabled;?> />
+												<span class="lbl fw-bolder"> Select All</span>
+											</label>
+											<div class="row activity">
+												<?php foreach($this->permissionObj->getactivity() as $activity_row):?>
+													<label class="inline col-lg-3">
+														<input type="checkbox" id="<?php echo "a_".$activity_row['id'];?>" name="admin_activity[]" value="<?php echo $activity_row['id'];?>" class="ace" <?php echo (in_array($activity_row['id'],$activity_array))?'checked':'';?> <?php echo $disabled;?>/>
+														<span class="lbl"> <?php echo $activity_row['activity'];?></span>
+													</label>
+												<?php endforeach; ?>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="space-6"></div>
+						<div class="row">
+							<div class="col-lg-12 padding-24"> 
+								<div class="widget-box">
+									<div class="widget-header widget-header-smaller">
+										<h5 class="widget-title lighter smaller">
+											<i class="fa fa-street-view"></i> Assign Administrative Location
+										</h5>
+									</div>
+									<div class="widget-body">
+										<div class="widget-main padding-24">
+											<label class="ace grey">
+												<?php $location_array = !empty($row['admin_location']) ? explode(",", $row['admin_location']) : [];
+													$location_count = $this->permissionObj->getlocationCount();?>
+												<input type="checkbox" class="ace" name="selectall" id="selectall" value="1" <?php echo (sizeof($location_array)==$location_count)?'checked':'';?> <?php echo $disabled;?>/>
+												<span class="lbl fw-bolder"> Select All</span>
+											</label>
+											<div class="row region">
+												<div class="col-lg-12">
+												<?php foreach ($this->permissionObj->getregion() as $region_row): ?>
+													<label class="ace blue">
+														<?php $region_location_count = $this->permissionObj->getlocationCount($region_row['id'],$row['admin_location']);
+															$region_locations = $this->permissionObj->getlocation($region_row['id']);?>
+														<input class="ace" type="checkbox" id="<?php echo "r_".$region_row['id'];?>" <?php echo (sizeof($region_locations)==$region_location_count)?'checked':'';?> <?php echo $disabled;?>/>
+														<span class="lbl fw-bold"> <?php echo $region_row['region'];?></span>
+													</label>
+													<div class="row <?php echo "r_".$region_row['id']?>">
+													<?php foreach($this->permissionObj->getlocation($region_row['id']) as $location_row):?>
+														<label class="inline col-lg-3 col-md-4">
+															<input class="ace" type="checkbox" name="admin_location[]" id="<?php echo "l_".$location_row['id']?>" value="<?php echo $location_row['id'];?>" <?php echo (in_array($location_row['id'],$location_array))?'checked':'';?> <?php echo $disabled;?>/>
+															<span class="lbl"> <?php echo $location_row['location'];?></span>
+														</label>
+													<?php endforeach; ?>
+													</div><hr style="margin: 3px 0;">
+												<?php endforeach; ?>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="widget-toolbox padding-6 clearfix align-right">
+						<button type="submit" class="btn btn-success"><span class="fa fa-check"></span> Save</button>
+						<a class="btn btn-warning" onclick="javascript:history.back();"><span class="fa fa-times"></span> Cancel </a> 
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+	$(function(){
+		$('select#region').on('change', function() {
+			$.post(
+				"<?php echo $this->url('user', ['action'=>'getlocationviaregion']); ?>",
+				{
+					region: $(this).val()
+				},
+				function(data){
+					$('select#location').html(data.location);
+					$('select#location').trigger('chosen:updated');
+				},'json'
+			);
+		});
+		$('input[type=checkbox]').click(function(){
+			if($(this).attr('id')=='selectall')
+				if($(this).prop("checked")) {
+					$('div.region input[type=checkbox]').prop("checked", true);
+				} else {
+					$('div.region input[type=checkbox]').prop("checked", false);
+				}
+			else if($(this).attr('id')=='selectall2'){
+				if($(this).prop("checked")) {
+					$('div.activity input[type=checkbox]').prop("checked", true);
+				} else {
+					$('div.activity input[type=checkbox]').prop("checked", false);
+				}
+			}
+		});	
+		$('div.region input[type=checkbox]').click(function(){
+			if($(this).prop("checked")) {
+				$("div."+$(this).attr('id')+" input[type=checkbox]").prop("checked", true);
+			} else {
+				$("div."+$(this).attr('id')+" input[type=checkbox]").prop("checked", false);
+			}
+			// Update selectall checkbox based on region checkboxes
+			var allChecked = $('div.region input[type=checkbox]:not(#selectall)').length === $('div.region input[type=checkbox]:not(#selectall):checked').length;
+			$('#selectall').prop("checked", allChecked);
+        });
+		$('div.activity input[type=checkbox]:not(#selectall2)').click(function(){
+			// Update selectall2 checkbox based on activity checkboxes
+			var allChecked = $('div.activity input[type=checkbox]:not(#selectall2)').length === $('div.activity input[type=checkbox]:not(#selectall2):checked').length;
+			$('#selectall2').prop("checked", allChecked);
+		});
+		const form = document.getElementById('#form');
+		const fv = FormValidation.formValidation(form, {
+			fields: {
+				cid: {
+					validators: {
+						notEmpty: {
+							message: 'Please provide citizen ID.'
+						},
+						integer: {
+	                        message: 'Please provide numeric values.'
+	                    },
+						remote: {
+							data: {
+								type:'cid',
+								user_id : form.querySelector('[name="user_id"]').value,
+							},
+							message: 'This cid has been already used.',
+							method: 'POST',
+							url: "<?php echo $this->url('user', array('action' => 'getvalidfield'));?>",
+						},
+						stringLength: {
+							min: 11,
+							max: 11,
+							message: 'The cid no. must be 11 digits.'
+						},
+					}
+				},
+				dob: {
+					validators: {
+						notEmpty: {
+							message: 'Please provide date of birth.'
+						},
+					}
+				},
+				name: {
+					validators: {
+						notEmpty: {
+							message: 'Please provide full name.'
+						},
+						regexp: {
+	                        regexp: /^[a-zA-z' ']+$/i,
+	                        message: 'Full name must be of alphabetical characters and spaces only.'
+	                    }
+					}
+				},
+				email: {
+					validators: {
+						notEmpty: {
+							message: 'Please provide email address.'
+						},
+						emailAddress: {
+	                        message: 'Please provide valid email address.'
+	                    },
+						remote: {
+							data: {
+								type:'email',
+								user_id : form.querySelector('[name="user_id"]').value,
+							},
+							message: 'This email has been already used.',
+							method: 'POST',
+							url: "<?php echo $this->url('user', array('action' => 'getvalidfield'));?>",
+						},
+					}
+				},
+				mobile: {
+					validators: {
+						notEmpty: {
+							message: 'Please provide mobile number'
+						},
+						digits: {
+	                        message: 'Please provide valid mobile number'
+	                    },
+						remote: {
+							data: {
+								type:'mobile',
+								user_id : form.querySelector('[name="user_id"]').value,
+							},
+							message: 'This mobile number has been already used.',
+							method: 'POST',
+							url: "<?php echo $this->url('user', array('action' => 'getvalidfield'));?>",
+						},
+	                    stringLength: {
+							min: 8,
+							max: 8,
+							message: 'The mobile no. must be 8 digits.'
+						},
+					}
+				},
+				'role[]': {
+					validators: {
+						choice: {
+							min: 1,
+							max: 10,
+							message: 'Please choose 1 - 10 roles.',
+						},
+					}
+				},
+				credit_authority: {
+					validators: {
+						notEmpty: {
+							message: 'Please select credit authority.'
+						}
+					}
+				},
+				region: {
+					validators: {
+						notEmpty: {
+							message: 'Please select posted region.'
+						}
+					}
+				},
+				location: {
+					validators: {
+						notEmpty: {
+							message: 'Please select posted location.'
+						}
+					}
+				},
+			},
+			plugins: {
+				trigger: new FormValidation.plugins.Trigger(),
+				bootstrap3: new FormValidation.plugins.Bootstrap3(),
+				submitButton: new FormValidation.plugins.SubmitButton(),
+				defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+			},
+		}).on('core.element.validated', function (e) {
+			if (e.valid) {
+				$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-invalid');
+				$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-valid');
+			} else {
+				$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-valid');
+				$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-invalid');
+			}
+		});
+		$('form select').chosen().change(function () {
+			fv.revalidateField($(this).attr('name'));
+		});
+		$('input.date-picker').on('changeDate', function (e) {
+			fv.revalidateField($(this).attr('name'));
+		});
+		$('#cid').on('change', function(){
+			fv.validateField('cid').then(function(status) {
+				if(status == 'Valid'){
+					$.when(
+						$('span#panel').html("<i class='fa fa-spinner fa-spin red bigger-110'></i>"),
+						$('#message1').empty(),
+						$('#name').val(""),
+						$('input#dob').val(""),
+					).done(function(){
+						$.when(
+							$.post(
+								"<?php echo $this->url('user', array('action' => 'getuserciddtl')); ?>",
+								{
+									cid: $('#cid').val(),
+								},
+								function(data,status,xhr){
+									if(data.cid > 0){ 
+										$('#message1').empty();
+										$('#name').val(data.name);
+										$('input#dob').val(data.dob);
+									}else{ 
+										$('#message1').html(data.message);
+										$('#name').val("");
+										$('input#dob').val("");
+									}
+								},
+								'json'
+							)
+						).done(function(){
+							$('span#panel').html("<i class='fa fa-user-o bigger-110'></i>");
+						});
+					});
+					
+				}
+			});
+		});
+	});
+</script>

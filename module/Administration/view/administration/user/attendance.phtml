@@ -1,0 +1,48 @@
+<?php 
+/**
+ * View -- of Implementation/ImplementationController/confirmimplementationAction
+ * chophel@athang.com
+ */
+	$this->headTitle($this->title);
+	foreach($attendance as $att);
+	 $my = explode(',', $role);
+	 
+?>             
+<div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title"> <i class="fa fa-checked"></i> Attendance</h4>
+    </div>     
+    <div class="modal-body text-center">       
+		<div class="panel panel-default">                       
+			<div class="panel-body">		
+		        <div class="alert alert-primary">
+			        <div class="btn-group">
+					<?php if(sizeof($attendance)==0 && $user!=219):?>
+					<a class="btn btn-xlg btn-primary" href="<?php echo $this->url('user', array('action' => 'entry','id'=>$user)); ?>">
+						Take Attendance
+						</a>
+						<?php elseif(sizeof($attendance)>0 && $att['exit']==null):?>
+						<a class="btn btn-xlg btn-danger" href="<?php echo $this->url('user', array('action' => 'exit','id'=>$user)); ?>">
+						Leave Office
+						</a>
+					<?php endif;?>
+					</div>
+		        </div>
+			</div>
+		</div>
+	</div> <!-- /modal-body -->        
+	<div class="modal-footer">
+		<div class="row">
+		<div class="col-lg-4">
+				<div class="pull-left tableTools-container">
+				<a href="<?php echo $this->url('user', array('action' => 'individual')); ?>">View Individual Attendance</a>
+			</div>
+		</div>
+		<?php //for($i=0;$i<sizeof($my);$i++):
+		//if($my[$i]==18):?>
+		<div style="padding-right:10px;">
+		<a href="<?php echo $this->url('user', array('action' => 'viewattendance','id'=>$user)); ?>">View Attendance</a>
+		</div>
+		<?php //endif;endfor;?>
+	</div>
+    </div>  

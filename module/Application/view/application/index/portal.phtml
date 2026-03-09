@@ -1,0 +1,303 @@
+<!-- Navbar -->
+<nav class="navbar navbar-inverse navbar-fixed-top portal-navbar">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#portal-navbar" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#hero"><i class="fa fa-city"></i>MY THIMPHU</a>
+        </div>
+        <div class="collapse navbar-collapse" id="portal-navbar">
+            <ul class="nav navbar-nav">
+                <li><a href="#" id="home-link"><i class="fa fa-home"></i> Home</a></li>
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-newspaper-o"></i> News <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <?php foreach ($news as $nws): ?>
+                        <li>
+                            <a href="<?php echo $this->url('auth', array('action'=>'registration'), array('query' => ['id' => $nws['id']])); ?>">
+                                <i class="fa fa-file-text"></i> <?php echo $this->escapeHtml($nws['name']); ?>
+                            </a>
+                        </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </li>
+                <li><a href="#" id="contact-link"><i class="fa fa-envelope"></i> Contact Us</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<!-- Search & Filter Section -->
+<div class="portal-search-section" style="background: none; background-color: transparent; margin-top: 70px;">
+    <div class="container-fluid search-container" style="background: none; background-color: transparent;">
+        <div class="search-input-group">
+            <div class="input-group input-group-lg">
+                <span class="input-group-addon"><i class="fa fa-search"></i></span>
+                <input id="news-search" type="text" class="form-control" placeholder="Search services, permits, news...">
+            </div>
+            <div class="results-info">
+                <span id="news-count" class="results-count"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Services Grid -->
+<div class="container-fluid portal-services" id="news-section">
+    <?php if(!empty($latestNewsByChannel)): ?>
+    <div class="latest-news-section">
+        <div class="row" id="news-grid">
+            <?php foreach($latestNewsByChannel as $channelId => $newsItem): ?>
+                <?php 
+                    // Find channel info
+                    $channelInfo = null;
+                    foreach($news as $ch) {
+                        if($ch['id'] == $channelId) {
+                            $channelInfo = $ch;
+                            break;
+                        }
+                    }
+                ?>
+                <?php if($channelInfo && !empty($newsItem['title'])): ?>
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 news-card-item" 
+                     data-name="<?php echo strtolower($this->escapeHtml($newsItem['title'])); ?>" 
+                     data-desc="<?php echo strtolower($this->escapeHtml($channelInfo['name'])); ?>"
+                     style="margin-bottom: 20px; padding: 10px;">
+                    <div class="latest-news-card" style="background: white; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 20px; height: 100%; display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; min-height: 280px;">
+                        <div class="latest-badge" style="display: inline-block; background: #3498db; color: white; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-bottom: 12px; width: fit-content;"><?php echo htmlspecialchars($channelInfo['name']); ?></div>
+                        <h4 class="latest-title" style="color: #2c3e50; margin: 0 0 12px 0; font-size: 16px; font-weight: bold; line-height: 1.4; flex-grow: 1;"><?php echo $this->escapeHtml($newsItem['title']); ?></h4>
+                        <p class="latest-desc" style="color: #7f8c8d; font-size: 13px; margin: 0 0 15px 0; line-height: 1.5;"><?php echo $this->escapeHtml(substr($newsItem['description'] ?? '', 0, 80)); ?>...</p>
+                            <a href="<?php echo $this->url('auth', array('action'=>'registration'), array('query' => ['id' => $channelId])); ?>" class="latest-btn" style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; padding: 10px 15px; border-radius: 4px; text-decoration: none; font-size: 13px; text-align: center; display: block; margin-top: auto; transition: opacity 0.2s;">
+                                <i class="fa fa-info-circle"></i> Read latest news
+                            </a>
+                    </div>
+                </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+</div>
+<div id="no-results" class="alert alert-info" style="display:none;">
+    <i class="fa fa-info-circle"></i> <strong>No matching services found.</strong> Try adjusting your search criteria.
+</div>
+
+<!-- Contact Us Section -->
+<div class="container-fluid" id="contact-section" style="display:none; padding: 40px 20px; margin-top: 80px;">
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="panel panel-primary" style="border: none; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <div class="panel-heading" style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%); border: none; padding: 20px; border-radius: 8px 8px 0 0;">
+                    <h3 class="panel-title" style="font-size: 24px; font-weight: bold;">
+                        <i class="fa fa-envelope"></i> Contact Us
+                    </h3>
+                    <p style="margin: 10px 0 0 0; opacity: 0.9;">We'd love to hear from you! Send us a message and we'll respond as soon as possible.</p>
+                </div>
+                <div class="panel-body" style="padding: 30px;">
+                    <div class="row">
+                        <!-- Contact Form -->
+                        <div class="col-md-7">
+                            <form id="contact-form" method="post">
+                                <div class="form-group">
+                                    <label for="contact-name" class="control-label">
+                                        <i class="fa fa-user"></i> Full Name <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control" id="contact-name" name="name" required placeholder="Enter your full name">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="contact-email" class="control-label">
+                                        <i class="fa fa-envelope"></i> Email Address <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="email" class="form-control" id="contact-email" name="email" required placeholder="your.email@example.com">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="contact-phone" class="control-label">
+                                        <i class="fa fa-phone"></i> Phone Number
+                                    </label>
+                                    <input type="tel" class="form-control" id="contact-phone" name="phone" placeholder="Enter your phone number">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="contact-subject" class="control-label">
+                                        <i class="fa fa-tag"></i> Subject <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-control" id="contact-subject" name="subject" required>
+                                        <option value="">Select a subject...</option>
+                                        <option value="general">General Inquiry</option>
+                                        <option value="support">Technical Support</option>
+                                        <option value="feedback">Feedback</option>
+                                        <option value="subscription">Subscription Issue</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="contact-message" class="control-label">
+                                        <i class="fa fa-comment"></i> Message <span class="text-danger">*</span>
+                                    </label>
+                                    <textarea class="form-control" id="contact-message" name="message" rows="5" required placeholder="Type your message here..."></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary btn-lg btn-block" style="background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%); border: none; padding: 12px; font-size: 16px;">
+                                        <i class="fa fa-paper-plane"></i> Send Message
+                                    </button>
+                                </div>
+                            </form>
+                            <div id="contact-alert" class="alert" style="display:none; margin-top: 20px;"></div>
+                        </div>
+                        
+                        <!-- Contact Information -->
+                        <div class="col-md-5">
+                            <div style="background: #f8f9fa; padding: 25px; border-radius: 8px; border-left: 4px solid #0f766e;">
+                                <h4 style="color: #0f766e; margin-top: 0;">
+                                    <i class="fa fa-info-circle"></i> Contact Information
+                                </h4>
+                                
+                                <div style="margin: 20px 0; padding: 15px 0; border-bottom: 1px solid #dee2e6;">
+                                    <h5 style="color: #333; margin: 0 0 10px 0;">
+                                        <i class="fa fa-map-marker" style="color: #0f766e; width: 20px;"></i> Address
+                                    </h5>
+                                    <p style="margin: 0; color: #666; padding-left: 25px;">
+                                        Thimphu, Bhutan
+                                    </p>
+                                </div>
+                                
+                                <div style="margin: 20px 0; padding: 15px 0; border-bottom: 1px solid #dee2e6;">
+                                    <h5 style="color: #333; margin: 0 0 10px 0;">
+                                        <i class="fa fa-phone" style="color: #0f766e; width: 20px;"></i> Phone
+                                    </h5>
+                                    <p style="margin: 0; color: #666; padding-left: 25px;">
+                                        +975 XXXX XXXX
+                                    </p>
+                                </div>
+                                
+                                <div style="margin: 20px 0; padding: 15px 0; border-bottom: 1px solid #dee2e6;">
+                                    <h5 style="color: #333; margin: 0 0 10px 0;">
+                                        <i class="fa fa-envelope" style="color: #0f766e; width: 20px;"></i> Email
+                                    </h5>
+                                    <p style="margin: 0; color: #666; padding-left: 25px;">
+                                        info@mythimphu.bt
+                                    </p>
+                                </div>
+                                
+                                <div style="margin: 20px 0; padding: 15px 0;">
+                                    <h5 style="color: #333; margin: 0 0 10px 0;">
+                                        <i class="fa fa-clock-o" style="color: #0f766e; width: 20px;"></i> Business Hours
+                                    </h5>
+                                    <p style="margin: 0; color: #666; padding-left: 25px;">
+                                        Monday - Friday: 9:00 AM - 5:00 PM<br>
+                                        Saturday: 9:00 AM - 1:00 PM<br>
+                                        Sunday: Closed
+                                    </p>
+                                </div>
+                                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid #dee2e6;">
+                                    <h5 style="color: #333; margin: 0 0 15px 0;">
+                                        <i class="fa fa-share-alt" style="color: #0f766e;"></i> Follow Us
+                                    </h5>
+                                    <div>
+                                        <a href="#" style="display: inline-block; width: 40px; height: 40px; line-height: 40px; text-align: center; background: #3b5998; color: white; border-radius: 50%; margin-right: 10px; text-decoration: none;">
+                                            <i class="fa fa-facebook"></i>
+                                        </a>
+                                        <a href="#" style="display: inline-block; width: 40px; height: 40px; line-height: 40px; text-align: center; background: #1da1f2; color: white; border-radius: 50%; margin-right: 10px; text-decoration: none;">
+                                            <i class="fa fa-twitter"></i>
+                                        </a>
+                                        <a href="#" style="display: inline-block; width: 40px; height: 40px; line-height: 40px; text-align: center; background: #c32aa3; color: white; border-radius: 50%; margin-right: 10px; text-decoration: none;">
+                                            <i class="fa fa-instagram"></i>
+                                        </a>
+                                        <a href="#" style="display: inline-block; width: 40px; height: 40px; line-height: 40px; text-align: center; background: #0077b5; color: white; border-radius: 50%; text-decoration: none;">
+                                            <i class="fa fa-linkedin"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    (function() {
+        function updateCount() {
+            var visible = $('.news-card-item:visible').length;
+            var total = $('.news-card-item').length;
+            $('#news-count').text(visible + ' of ' + total + ' items');
+            $('#no-results').toggle(visible === 0);
+        }
+        $('#news-search').on('keyup', function() {
+            var q = $(this).val().toLowerCase();
+            $('.news-card-item').each(function(){
+                var name = $(this).data('name');
+                var desc = $(this).data('desc');
+                var match = !q || name.indexOf(q) > -1 || desc.indexOf(q) > -1;
+                $(this).toggle(match);
+            });
+            updateCount();
+        });
+        // Toggle between sections
+        $('#home-link').on('click', function(e) {
+            e.preventDefault();
+            $('#news-section').show();
+            $('#contact-section').hide();
+            $('.portal-search-section').show();
+            $('#news-search').trigger('keyup'); // Re-apply search
+            // Close the menu
+            $('#portal-navbar').collapse('hide');
+        });
+        $('#contact-link').on('click', function(e) {
+            e.preventDefault();
+            $('#news-section').hide();
+            $('#cinema-section').hide();
+            $('#contact-section').show();
+            $('.portal-search-section').hide();
+            $('#no-results').hide();
+            // Close the menu
+            $('#portal-navbar').collapse('hide');
+            // Scroll to top smoothly, accounting for navbar height
+            $('html, body').animate({scrollTop: 70}, 300);
+        });
+
+        // Contact form submission
+        $('#contact-form').on('submit', function(e) {
+            e.preventDefault();
+            
+            var formData = {
+                name: $('#contact-name').val(),
+                email: $('#contact-email').val(),
+                phone: $('#contact-phone').val(),
+                subject: $('#contact-subject').val(),
+                message: $('#contact-message').val()
+            };
+            
+            // Show loading state
+            var $btn = $(this).find('button[type="submit"]');
+            var originalText = $btn.html();
+            $btn.html('<i class="fa fa-spinner fa-spin"></i> Sending...').prop('disabled', true);
+            
+            // Simulate form submission (replace with actual AJAX call)
+            setTimeout(function() {
+                $('#contact-alert')
+                    .removeClass('alert-danger')
+                    .addClass('alert-success')
+                    .html('<i class="fa fa-check-circle"></i> <strong>Success!</strong> Your message has been sent. We\'ll get back to you soon.')
+                    .slideDown();
+                
+                $('#contact-form')[0].reset();
+                $btn.html(originalText).prop('disabled', false);
+                
+                // Hide alert after 5 seconds
+                setTimeout(function() {
+                    $('#contact-alert').slideUp();
+                }, 5000);
+            }, 1500);
+        });
+
+        updateCount();
+    })();
+</script>

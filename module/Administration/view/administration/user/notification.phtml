@@ -1,0 +1,48 @@
+<?php 
+/**
+ * View -- of Administration/UserController/notificationAction
+ * chophel@athang.com 
+ */
+	$this->headTitle($this->title);
+?>
+<?php foreach ($users as $user);?>
+<?php echo $this->tabs_helper(array(403,409,410),$user['id']); ?>
+<div class="card">
+	<div class="card-header"></div>
+	<div class="table-responsive">
+		<table class="table card-table text-nowrap" id="dataTables">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Notification</th>
+					<th>Priority</th>
+					<th>Flag</th>
+					<th class="no-print">Action</th>
+				</tr>
+			</thead>
+			<tbody>
+			<?php $i=1+(($page-1)*25); foreach($paginator as $row):?>
+			<tr>
+				<td><?php echo $i++; ?></td>
+				<td><?php echo $row['desc']; ?></td>
+				<td><span class="status-dot status-dot-animated <?php echo ($row['priority']==1)?'bg-red':'bg-green';?>"></span></td>
+				<td><?php echo ($row['flag']==0)?"<i class='ace-icon fa fa-flag green'></i>":"<i class='ace-icon fa fa-flag grey'></i>"; ?></td>
+				<td>
+					<span data-bs-toggle="tooltip" data-bs-placement="top" title="" data-bs-original-title="View Notification">
+					<a class="btn btn-primary btn-sm" href="<?php echo $this->url($row['route'], array('action'=>$row['action'], 'id'=>$row['key'].'_'.$row['id']));?>">
+						<i class="ace-icon fa fa-eye"></i> 
+					</a></span>
+				</td>
+			</tr>
+			<?php endforeach;?>
+			</tbody>
+		</table>
+	</div>
+	<div class="card-footer d-flex align-items-center">
+		<?php echo $this->paginationControl($this->paginator,'Sliding','adm_pagination.phtml', 
+			array('route' => 'user/paginator','action'=>'useractivity','id'=>$user['id']));?>
+	</div>
+</div>
+<script type="text/javascript">
+	$('#dataTables').DataTable();
+</script>

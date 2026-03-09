@@ -1,0 +1,125 @@
+<?php
+/**
+ * View -- of Administration/FlowController/flowprivilegeAction
+ * chophel@athang.com
+ */
+	$this->headTitle($this->title);
+?>
+<?php foreach($flows as $flow);?>
+<div class="card">
+	<div class="card-header">
+		<h4 class="card-title">Work Flow <span class="card-subtitle"><?php echo $flow['flow'];?></span></h4>
+		<div class="pull-right"></div>
+	</div>
+	<div class="card-body">
+		<div class="row" id="convert-tb0">
+			<div class="col-lg-8" id="convert-tb1">
+				<ul class="list-unstyled spaced">
+					<li>
+						<i class="ace-icon fa fa-caret-right blue"></i>
+						Work Flow Name : <b class="red"><?php echo $flow['flow'];?></b>
+					</li>
+					<li>
+						<i class="ace-icon fa fa-caret-right blue"></i>
+						Role : <b class="red"><?php echo $this->roleObj->getColumn($flow['role'],'role'); ?></b>
+					</li>
+				</ul>
+			</div>
+			<div class="col-lg-4" id="convert-tb2">
+				<ul class="list-unstyled spaced">
+					<li>
+						<i class="ace-icon fa fa-caret-right blue"></i>
+						Process : <b class="red"><?php echo $this->processObj->getColumn($flow['process'],'process'); ?></b>
+					</li>
+					<li>
+						<i class="ace-icon fa fa-caret-right blue"></i>
+						Status : <b class="red"><?php echo $this->status($flow['status']);?></b>
+					</li>
+				</ul>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-lg-12">
+				<ul class="list-unstyled spaced">
+					<li>
+						<i class="ace-icon fa fa-caret-right blue"></i>Note: <b class="red"><?php echo $flow['description'];?></b>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="card">
+	<div class="card-header">
+		<div class="btn-group pull-right">
+			<?php echo $this->button(2,$flow['id']."_".$page);?>
+		</div>
+	</div>
+	<div class="table-responsive">
+		<table class="table card-table text-wrap datatable" id="dataTables">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Action Performed</th>
+					<th>Status Changed To</th>
+					<th>Route To</th>
+					<th>Action</th>
+					<th>Description</th>
+					<th>Route Notification</th>
+					<th>Notification</th>
+					<th>Email</th>
+					<?php if($this->button(1)!=""):?>
+						<th class="no-printpdf">Action</th>
+					<?php endif;?>	
+				</tr>
+			</thead>
+			<tbody>
+			<?php $i=1+(($page-1)*10); foreach ($paginator as $row):?>
+				<tr>
+					<td><?php  echo $i++; ?></td>								       
+					<td><?php echo ($row['action_performed']=='0')?"Initial":$this->flowactionObj->getColumn($row['action_performed'],'action'); ?></td>
+					<td><?php echo $this->status($row['status_changed_to']); ?></td>
+					<td><?php echo ($row['route_to_role']=='0')?'-':$this->roleObj->getColumn($row['route_to_role'],'role');?></td>
+					<td><?php $btn_array = explode("|", $row['action']);
+						for($j=0;$j<sizeof($btn_array);$j++):
+							echo '"'.$this->flowactionObj->getColumn($btn_array[$j],'action').'"';
+							echo ($j != sizeof($btn_array)-1)?" | ":"";
+						endfor;
+					?></td>
+					<td><?php echo $row['description']; ?></td>
+					<td class="fst-italic"><?php $notification_array = explode("|", $row['route_notification_to']);
+						for($k=0;$k<sizeof($notification_array);$k++):
+							if($notification_array[$k]):
+								echo $this->roleObj->getColumn($notification_array[$k],'role');
+								echo ($k != sizeof($notification_array)-1)?" | ":"";
+							else:
+								echo "-";
+							endif;
+						endfor;
+					?></td>
+					<td class="text-center fst-italic"><?php echo ($row['notification']=='1')?'-Yes-':'-No-';?></td>
+					<td class="text-center fst-italic"><?php echo ($row['email_notify']=='1')?'-Yes-':'-No-';?></td>
+					<?php if($this->button(1)!=""):?>
+						<td><?php echo $this->button(1, $flow['id']."_".$row['id'].'_'.$page);?></td>
+					<?php endif;?>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
+	</div>
+	<div class="card-footer d-flex align-items-center">
+		<?php echo $this->paginationControl($this->paginator,'Sliding','adm_pagination.phtml', 
+			array('route' => 'flow/paginator','action'=>'flowprivilege','id'=>$flow['id']));?>
+	</div>
+</div>
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+$('document').ready(function(){
+	$('#dataTables').DataTable();
+});
+</script>

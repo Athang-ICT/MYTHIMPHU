@@ -1,0 +1,208 @@
+ <?php
+/**
+ * View -- of Administration/FlowController/editflowprivilegeAction
+ * chophel@athang.com
+ */
+	$this->headTitle($this->title);
+?>
+<?php foreach ($privileges as $row);?> 
+<form id="#form" action="<?php echo $this->url('flow', array('action' => 'editflowprivilege', 'id' => $page));?>" method="post" enctype="multipart/form-data">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title"> <i class="ace-icon fa fa-pencil-square-o"></i> <?php echo $this->title; ?></h4>
+    </div> <!-- /modal-header -->
+    <div class="modal-body">
+		<div class="panel panel-default">
+			<div class="panel-body">  
+				<div class="row">
+					<input type="hidden" id="privilege_id" name="privilege_id" value="<?php echo $row['id'];?>" />
+					<input type="hidden" id="flow_id" name="flow_id" value="<?php echo $row['flow'];?>" />
+					<div class="form-group col-md-12">
+						<label class="control-label" for="action_performed">Action Performed</label>
+						<select class="form-control" name="action_performed" id="action_performed" data-placeholder="Select" >
+							<option value=""></option>	
+							<option value="0" <?php echo ($row['action_performed']=='0')?'selected':'';?>>Initial</option>
+							<?php foreach($actions as $action_performed):?>
+								<option value="<?php echo $action_performed['id'];?>" <?php echo ($action_performed['id']==$row['action_performed'])?'selected':'';?>>
+									<?php echo $action_performed['action'];?>
+								</option>
+							<?php endforeach;?>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-md-6">  
+						<label class="control-label" for="status_changed_to">Status Changed To</label>
+						<select id="status_changed_to" name="status_changed_to" class="form-control" data-placeholder="Select">
+							<option value=""></option>
+							<?php foreach($statuses as $status_changed_to):?>
+								<option value="<?php echo $status_changed_to['id'];?>" <?php echo ($status_changed_to['id']==$row['status_changed_to'])?'selected':'';?>>
+									<?php echo $status_changed_to['status'];?></option>
+							<?php endforeach;?>
+						</select>
+					</div>
+					<div class="form-group col-md-6">  
+						<label class="control-label" for="route_to_role">Route To Role</label>
+						<select id="route_to_role" name="route_to_role" class="form-control" data-placeholder="Select">
+							<option value=""></option>
+							<option value="0" <?php echo ($row['route_to_role']=='0')?'selected':'';?>>None</option>
+							<?php foreach($roles as $route_to_role):?>
+								<option value="<?php echo $route_to_role['id'];?>" <?php echo ($route_to_role['id']==$row['route_to_role'])?'selected':'';?>>
+									<?php echo $route_to_role['role'];?></option>
+							<?php endforeach;?>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-md-12">
+						<label class="control-label" for="action">Flow Action</label>
+						<?php $btn_array = explode("|", $row['action']);?>
+						<select multiple="" class="form-control" name="action[]" id="action" data-placeholder="Select" >
+							<?php foreach($actions as $action):?>
+								<option value="<?php echo $action['id'];?>" <?php echo (in_array($action['id'],$btn_array))?'selected':'';?>>
+									<?php echo $action['action'];?>
+								</option>
+							<?php endforeach;?>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div  class="form-group col-md-12">
+						<label for="description" class="control-label">Notification Message</label>
+						<textarea class="form-control" type="text" name="description" id="description"><?php echo $row['description'];?></textarea>
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-md-12">
+						<label class="control-label" for="route_notification_to">Route Notification To</label>
+						<?php $notification_array = explode("|", $row['route_notification_to']);?>
+						<select multiple="" class="form-control" name="route_notification_to[]" id="route_notification_to" data-placeholder="Select" >
+							<?php foreach($roles as $route_notification_to):?>
+								<option value="<?php echo $route_notification_to['id'];?>" <?php echo (in_array($route_notification_to['id'],$notification_array))?'selected':'';?>>
+									<?php echo $route_notification_to['role'];?>
+								</option>
+							<?php endforeach;?>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div  class="form-group col-md-6">
+						<label for="notification" class="control-label">System Notification</label>
+						<div class="radio">
+							<label>
+								<input class="ace" type="radio" name="notification" id="notification" value="1" <?php echo ($row['notification']=='1')?"checked":"";?> />
+								<span class="lbl"> Yes </span>
+							</label>
+							<label>
+								<input class="ace" type="radio" name="notification" id="notification" value="0" <?php echo ($row['notification']=='0')?"checked":"";?> />
+								<span class="lbl"> No </span>
+							</label>
+						</div>
+					</div>
+					<div  class="form-group col-md-6">
+						<label for="email_notify" class="control-label">Email Notification</label>
+						<div class="radio">
+							<label>
+								<input class="ace" type="radio" name="email_notify" id="email_notify" value="1" <?php echo ($row['email_notify']=='1')?"checked":"";?> />
+								<span class="lbl"> Yes </span>
+							</label>
+							<label>
+								<input class="ace" type="radio" name="email_notify" id="email_notify" value="0" <?php echo ($row['email_notify']=='0')?"checked":"";?> />
+								<span class="lbl"> No </span>
+							</label>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div> <!-- /modal-body -->
+    <div class="modal-footer">
+		<button type="submit" class="btn btn-success"><i class="ace-icon fa fa-check"></i>Save</button>
+        <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="ace-icon fa fa-times"></i>Cancel</button> 
+    </div>  
+</form>
+<script>
+$(function(){
+	const fv = FormValidation.formValidation(document.getElementById('#form'), {
+        fields: {
+			action_performed: {
+				validators: {
+					notEmpty: {
+						message: 'Please select action performed.'
+					},
+				}
+			},
+			status_changed_to: {
+				validators: {
+					notEmpty: {
+						message: 'Please select status changed to.'
+					},
+				}
+			},
+			route_to_role: {
+				validators: {
+					notEmpty: {
+						message: 'Please select route to role.'
+					},
+				}
+			},
+			'action[]': {
+				validators: {
+					choice: {
+						min: 0,
+						max: 5,
+						message: 'Please choose 0 - 5 flow-actions.',
+					},
+				}
+			},
+			'description': {
+				validators: {
+					notEmpty: {
+						message: 'Please provide notification message.'
+					},
+				}
+			},
+			'route_notification_to[]': {
+				validators: {
+					choice: {
+						min: 0,
+						max: 5,
+						message: 'Please choose 0 - 5 roles-for-sending-notification.',
+					},
+				}
+			},
+			notification: {
+				validators: {
+					notEmpty: {
+						message: 'Please select system notification.'
+					},
+				}
+			},
+			email_notify: {
+				validators: {
+					notEmpty: {
+						message: 'Please select email notification.'
+					},
+				}
+			},
+        },
+        plugins: {
+            trigger: new FormValidation.plugins.Trigger(),
+            bootstrap3: new FormValidation.plugins.Bootstrap3(),
+            submitButton: new FormValidation.plugins.SubmitButton(),
+            defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+        },
+    }).on('core.element.validated', function (e) {
+		if (e.valid) {
+			$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-invalid');
+			$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-valid');
+		} else {
+			$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-valid');
+			$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-invalid');
+		}
+	});
+	$('form select').chosen().change(function () {
+		fv.revalidateField($(this).attr('name'));
+	});
+});
+</script>

@@ -1,0 +1,144 @@
+<?php 
+/**
+ * View -- of Administration/MasterController/addlocation
+ * chophel@athang.com
+ */
+$this->headTitle($this->title);
+?>
+<form id="#form" method="post" action="<?php echo $this->url('setmaster', array('action' => 'addlocation','id'=>$page)); ?>"  enctype="multipart/form-data" >                  
+    <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title"> <i class="ace-icon fa fa-plus-square-o"></i> <?php echo $this->title; ?></h4>
+    </div>  <!-- /modal-header -->
+    <div class="modal-body">
+		<div class="panel panel-default">
+			<div class="panel-body">   
+				<div class="row">
+					<div class="form-group col-lg-4">  
+						<label class="control-label" for="region">Region</label>
+						<select id="region" name="region" class="form-control" data-placeholder="Select">
+							<option value="" selected></option>
+							<?php foreach($regions as $region):?>
+								<option value="<?php echo $region['id']?>">
+									<?php echo $region['region'];?></option>
+							<?php endforeach;?>
+						</select>
+					</div>
+					<div class="form-group col-lg-4">  
+						<label class="control-label" for="location_type">Location Type</label>
+						<select id="location_type" name="location_type" class="form-control" data-placeholder="Select">
+							<option value=""></option>
+							<?php foreach($locationtypes as $locationtype):?>
+								<option value="<?php echo $locationtype['id']?>">
+									<?php echo $locationtype['location_type'];?></option>
+							<?php endforeach;?>
+						</select>
+					</div>
+					<div class="form-group col-lg-4"> 
+						<label class="control-label" for="location">Location Name</label>
+						<input type="text" class="form-control" name="location" id="location" placeholder="Location Name" required /> 
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-lg-4">  
+						<label class="control-label" for="district">Dzongkhag</label>
+						<select id="district" name="district" class="form-control" data-placeholder="Select">
+							<option value="-1" selected>None</option>
+							<?php foreach($districts as $district):?>
+								<option value="<?php echo $district['id']?>">
+									<?php echo $district['district'];?></option>
+							<?php endforeach;?>
+						</select>
+					</div>
+					<div class="form-group col-lg-4"> 
+						<label class="control-label" for="coordinates">Coordinates</label>
+						<input type="text" class="form-control" name="coordinates" id="coordinates" placeholder="Coordinates" /> 
+					</div>
+					<div class="form-group col-lg-4">
+						<label for="status" class="control-label">Status</label>
+						<div class="radio">
+							<label>
+								<input class="ace" type="radio" name="status" id="status" value="1" checked />
+								<span class="lbl"> Yes </span>
+							</label>
+							<label>
+								<input class="ace" type="radio" name="status" id="status" value="0" />
+								<span class="lbl"> No </span>
+							</label>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div  class="form-group col-lg-4">
+						<label class="control-label" for="prefix">Prefix</label>
+						<input type="text" class="form-control" name="prefix" id="prefix" placeholder="Prefix" /> 
+					</div>
+				</div>
+			</div>
+		</div>
+	</div> <!-- /modal-body -->    
+    <div class="modal-footer">
+		<button type="submit" class="btn btn-success"><i class="ace-icon fa fa-check"></i>Save</button>
+        <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="ace-icon fa fa-times"></i>Cancel</button> 
+    </div>
+</form>
+<script>
+$(function(){
+	const fv = FormValidation.formValidation(document.getElementById('#form'), {
+		fields: {
+			region: {
+				validators: {
+					notEmpty: {
+						message: 'Please select region.'
+					}
+				}
+			},
+			location_type: {
+				validators: {
+					notEmpty: {
+						message: 'Please select location type.'
+					}
+				}
+			},
+			location: {
+				validators: {
+					notEmpty: {
+						message: 'Please provide location name.'
+					}
+				}
+			},
+			district: {
+				validators: {
+					notEmpty: {
+						message: 'Please select dzongkhag.'
+					}
+				}
+			},
+			status: {
+				validators: {
+					notEmpty: {
+						message: 'Please select status.'
+					}
+				}
+			},
+		},
+		plugins: {
+			trigger: new FormValidation.plugins.Trigger(),
+			bootstrap3: new FormValidation.plugins.Bootstrap3(),
+			submitButton: new FormValidation.plugins.SubmitButton(),
+			defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+		},
+	}).on('core.element.validated', function (e) {
+		if (e.valid) {
+			$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-invalid');
+			$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-valid');
+		} else {
+			$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-valid');
+			$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-invalid');
+		}
+	});
+	$('form select').chosen().change(function () {
+		fv.revalidateField($(this).attr('name'));
+	});
+});
+</script>

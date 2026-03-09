@@ -1,0 +1,157 @@
+<?php
+/**
+ * View -- of Sales/SaleController/indexAction
+ */
+	$this->headTitle($this->title);	
+?>
+<?php echo $this->partial('administration/user/partial.phtml', array('active' => 'daily')); ?>
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<form id="#form" method="post" action="<?php echo $this->url('user',array('action'=>'viewattendance')); ?>"  enctype="multipart/form-data" >
+				<div class="form-group col-lg-2">
+				<label class="control-label" for="att_date">Date</label>
+								<div class="date input-group" id="att_date" data-date="<?php echo $data['att_date'];?>" data-date-format="yyyy-mm-dd" >
+									<input class="form-control span2" name="att_date" id="att_date" type="text" placeholder="Date" value="<?php echo $data['att_date'];?>"  required>
+									<span class="input-group-addon add-on"><i class="fa fa-calendar"></i></span>
+								</div>
+				</div>
+				<div class="form-group col-lg-2">
+					<label class="control-label" for="region">Region/Division</label>
+					<select class="form-control" id="region" name="region" data-placeholder="Select" >
+						<option value="-1" <?php echo ($data['region'] == '-1')?'selected':'';?>>All</option>
+						<?php foreach($region as $region):?>
+							<option value="<?php echo $region['id'];?>" <?php echo ($region['id']==$data['region'])?'selected':''; ?>>
+								<?php echo $region['region'];?>
+							</option> 
+						<?php endforeach;?>
+					</select>
+				</div>
+				<div class="form-group col-lg-2">
+					<label class="control-label" for="location">Location</label>
+					<select class="form-control" id="location" name="location" data-placeholder="Select">
+						<option value="-1" <?php echo ($data['location'] == '-1')?'selected':'';?>>All</option>
+						<?php foreach($location as $loc):?>
+							<option value="<?php echo $loc['id'];?>" <?php echo ($loc['id']==$data['location'])?'selected':''; ?>>
+								<?php echo $loc['location'];?>
+							</option> 
+						<?php endforeach;?>
+					</select>
+				</div>
+				<div class="col-lg-6">
+					<div class="space-12"></div>
+					<button type="submit" class="btn btn-sm btn-primary "><i class="fa fa-refresh"></i> Refresh </button>
+				</div>
+				<!-- <div class="col-lg-2">
+					<div class="clearfix">
+						<div class="pull-right tableTools-container">
+						<a class="btn btn-xs btn-primary" data-target="#modal" data-toggle="modal"  href="<?php echo $this->url('user', array('action' => 'timing','id'=>1)); ?>">
+							Update Timing
+							</a>
+						</div>
+					</div>
+				</div> -->
+			</form>
+		</div>
+	</div>
+	<div class="card-body">
+		<div>
+			<table class="table table-bordered table-striped table-hover" id="dataTables">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>User</th>
+						<th>Region</th>
+						<th>Location</th>
+						<th>Date</th>
+						<th>Entry</th>
+						<th>Late Reason</th>
+						<th>Leave Office</th>
+						<th>Early Reason</th>
+					</tr>
+				</thead>
+				<tbody>
+				<?php $i=1; foreach($employee as $emp):
+				if($emp['id']!=1):
+				?>
+				
+					<tr data-href="<?php echo $this->url('user', array('action'=>'viewattendance', 'id'=>$att['user']));?>" >
+						<td><?php echo $i++; ?></td>
+						<td><?php echo $emp['full_name']; ?></td>
+						<td><?php echo $this->regionObj->getColumn($emp['region_id'],'region');?></td>
+						<td><?php echo $this->locationObj->getColumn($emp['location_id'],'location');?></td>
+						<td><?php echo $data['att_date']; ?></td>
+						<?php $user=$this->attendance->getAtt(array('a.date'=>$data['att_date'],'e.id'=>$emp['id']));
+						//print_r($user);exit;
+						if(sizeof($user)==Null):?>
+							<td style="background-color:red;">Absent</td>
+							<td></td>
+							<td></td>
+							<td></td>
+						<?php else:
+						foreach($user as $users);
+							$entry=$this->attendance->getColumn(array('date'=>$data['att_date'],'user'=>$users['user']),'entry');
+							$exit=$this->attendance->getColumn(array('date'=>$data['att_date'],'user'=>$users['user']),'exit');
+							$late=$this->attendance->getColumn(array('date'=>$data['att_date'],'user'=>$users['user']),'late_reason');
+							$early=$this->attendance->getColumn(array('date'=>$data['att_date'],'user'=>$users['user']),'early_reason'); 
+							
+								if($entry<='09:15:00'):?>
+									<td style="background-color:#3F9B0B;"><?php  echo $entry;?></td>
+								<?php else:?>
+									<td style="background-color:#FFD801;"><?php echo $entry;?></td>
+								<?php endif;?>
+							<td><?php echo $late;?></td>
+							<?php if($exit>=$timing):?>
+								<td style="background-color:#3F9B0B;"><?php echo $exit;?></td>
+							<?php elseif($exit==null):?>
+							<td></td>
+							<?php else:?>
+								<td style="background-color:#FFD801;"><?php echo $exit;?></td>
+							<?php endif;?>
+							<td><?php echo $early;?></td>
+						<?php endif;?>
+					</tr>
+					<?php endif;endforeach; ?>
+				</tbody>	
+			</table>
+		</div>
+	</div>
+</div>
+<div id="modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content"> </div>
+	</div>
+</div>
+<script>	
+$('document').ready(function(){
+	$('#att_date').datepicker();
+	$('#dataTables').DataTable({
+		"paging":   true,
+	});
+	$("tr[data-href]").each(function(){
+		$(this).find('td').not('td.action').each(function(){
+			$(this).css('cursor','pointer');
+			$(this).bind('click',function() {
+				window.document.location = $(this).closest('tr').attr("data-href");
+			});
+		});
+	});
+	$('#region').on('change',function(){
+		$.post(
+				"<?php echo $this->url('user', array('action' => 'getlocationviaregion'));?>",
+				{
+					region: $(this).val(),
+				},
+				function(data){
+					$('select#location').html(data.location);
+					$('select#location').trigger('chosen:updated');
+				},
+				'json'
+			);
+	});
+	$('#dataTables').genpdftable({
+		src:"<?php echo $this->url('pdfxls', array('action' => 'pdf'));?>",
+		orentation:"P",//L =landscape, P = potrait
+	});
+});
+</script>

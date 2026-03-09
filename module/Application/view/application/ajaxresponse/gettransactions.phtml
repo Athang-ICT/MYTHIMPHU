@@ -1,0 +1,15 @@
+<option value="0">NAN</option>
+<?php 
+foreach ($transactiondtls as $tdtls):
+        if($tdtls->ref_no !=NULL):
+                if($tdtls->debit !='0.00' && $tdtls->status ==4):?>
+                        <option value="<?php echo $tdtls->id; ?>"><?php echo $tdtls->ref_no; ?>[<?php echo $tdtls->debit; ?>]</option>
+                <?php 
+                elseif($tdtls->credit !='0.00' && $tdtls->status ==4):?>
+                <option value="<?php echo $tdtls->id; ?>"><?php echo $tdtls->ref_no; ?>[<?php echo $tdtls->credit; ?>]</option>
+        <?php endif;
+       endif;
+endforeach; ?>
+	
+
+	

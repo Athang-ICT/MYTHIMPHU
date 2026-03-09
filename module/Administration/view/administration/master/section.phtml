@@ -1,0 +1,84 @@
+<?php
+/**
+ * View -- of Administration/MasterController/departmentAction
+ * chophel@athang.com
+ */
+	$this->headTitle($this->title);
+?>
+<?php echo $this->tabs_helper(array(422,425,428,431,434,437)); ?>
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<div class="col-lg-9">
+				<form method="POST">    
+					<div class="row">
+						<div class="form-group col-lg-4">
+							<label for="division" class="control-label">Division</label>
+							<select id="division" name="division" class="form-control" data-placeholder="Select">
+								<option value="-1" <?php echo ($division_id == '-1')?'selected':'';?>>All</option>
+								<?php foreach($this->divisionObj->get(array('status'=>'1')) as $division):?>
+									<option value="<?php echo $division['id']?>"<?php echo ($division['id']==$division_id)?'selected':'';?>>
+										<?php echo $division['activity'];?></option>
+								<?php endforeach;?>
+							</select>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="col-lg-3 ">
+				<div class="space"></div>
+				<div class="btn-group pull-right">
+					<?php echo $this->button(2,$page);?>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="table-responsive">
+		<table class="table card-table text-nowrap" id="dataTables">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Section</th>
+					<th>Prefix</th>
+					<th>Division</th>
+					<th>Status</th>
+					<?php if($this->button(1)!=""):?>
+						<th class="no-sort no-printpdf">Action</th>
+					<?php endif;?>	
+				</tr>
+			</thead>
+			<tbody>
+				<?php $i=1+(($page-1)*20); foreach ($paginator as $row):?>
+					<tr>
+						<td><?php echo $i++; ?> </td>
+						<td><b><?php echo $row['section']; ?></b></td>
+						<td><?php echo $row['prefix']; ?></td>
+						<td><?php echo $this->divisionObj->getColumn($row['division'],'activity'); ?></td>
+						<td><?php echo $this->status($row['status']); ?></td>
+						<?php if($this->button(1)!=""):?>
+							<td><?php echo $this->button(1, $row['id'].'_'.$page);?></td>
+						<?php endif;?>
+					</tr>
+				<?php endforeach;?>
+			</tbody>
+		</table>
+	</div>
+	<div class="card-footer d-flex align-items-center">
+		<?php echo $this->paginationControl($this->paginator,'Sliding','adm_pagination.phtml', 
+			array('route' => 'setmaster/paginator','action'=>'section','id'=>$division_id));?>
+	</div>
+</div>
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+$('document').ready(function(){
+	$('#division').change(function(){
+		window.location.href="<?php echo $this->url('setmaster',array('action'=>'section'));?>/"+$(this).val();
+	});
+	$('#dataTables').DataTable();
+});
+</script>

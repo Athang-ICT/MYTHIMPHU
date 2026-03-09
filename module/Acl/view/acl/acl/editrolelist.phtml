@@ -1,0 +1,83 @@
+<?php 
+/**
+ * View -- of Acl/AclController/editrolelist
+ * chophel@athang.com
+ */
+$this->headTitle($this->title);
+?>
+<?php foreach($this->rolesObj->get($this->role_id) as $row);?>
+<form id="#form" method="post" action="<?php echo $this->url('acl', array('action' => 'editrolelist','id'=>$page)); ?>"  enctype="multipart/form-data">                  
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title"><i class="ace-icon fa fa-pencil-square-o"></i><?php echo $this->title.": ".$row['role']; ?></h4>
+    </div>  <!-- /modal-header -->
+    <div class="modal-body">
+        <div class="panel panel-default">
+			<div class="panel-body">      
+                <div class="row">
+                    <div class="col-lg-12">
+                        <input type="hidden" id="role_id" name="role_id" value="<?php echo $row['id'];?>" />
+                        <div class="form-group">  
+                            <label class="control-label" for="role">Role</label>
+                            <input type="text" class="form-control" name="role" id="role" placeholder='Role' value="<?php echo $row['role'];?>" required /> 
+                        </div>
+                        <div class="form-group">  
+                            <label class="control-label" for="description">Description</label>
+                            <input type="text" class="form-control" name="description" id="description" placeholder='Description' value="<?php echo $row['description'];?>" required /> 
+                        </div>
+                        <div class="form-group">
+                            <label for="status" class="control-label">Status</label>
+                            <div class="radio">
+                                <label>
+                                    <input class="ace" type="radio" name="status" id="status" value="1" <?php echo ($row['status']=='1')?"checked":"";?> />
+                                    <span class="lbl"> Yes </span>
+                                </label>
+                                <label>
+                                    <input class="ace" type="radio" name="status" id="status" value="0" <?php echo ($row['status']=='0')?"checked":"";?> />
+                                    <span class="lbl"> No </span>
+                                </label>
+                            </div>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+        </div>
+	</div> <!-- /modal-body -->    
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success"><i class="ace-icon fa fa-check"></i>Save</button>
+        <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="ace-icon fa fa-times"></i>Cancel</button> 
+    </div>
+</form>
+<script>
+	FormValidation.formValidation(document.getElementById('#form'), {
+        fields: {
+            role: {
+                validators: {
+                    notEmpty: {
+                        message: 'Please provide role name.'
+                    }
+                }
+            },
+            description: {
+                validators: {
+                    notEmpty: {
+                        message: 'Please provide description.'
+                    }
+                }
+            },
+            status: {
+				validators: {
+					notEmpty: {
+						message: 'Please select status.'
+					}
+				}
+			},
+        },
+        plugins: {
+            trigger: new FormValidation.plugins.Trigger(),
+            bootstrap3: new FormValidation.plugins.Bootstrap3(),
+            submitButton: new FormValidation.plugins.SubmitButton(),
+            defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+        },
+    });
+</script>

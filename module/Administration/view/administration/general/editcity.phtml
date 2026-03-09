@@ -1,0 +1,79 @@
+<?php
+/**
+ * View -- of Administration/MasterController/editcity
+ * chophel@athang.com
+ */
+foreach($city as $row);
+?>
+<form id="#form" method="post" action="<?php echo $this->url('general', array('action' => 'editcity','id'=>$row['id'])); ?>" enctype="multipart/form-data">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title"> <i class="ace-icon fa fa-plus-square-o"></i> <?php echo $this->title; ?></h4>
+    </div>  <!-- /modal-header -->
+    <div class="modal-body">
+		<div class="panel panel-default">
+			<div class="panel-body">  
+				<div class="row">
+					<div class="col-lg-12">
+						<div  class="form-group">
+							<label for="country" class="control-label">Country</label>
+							<select class="form-control" name="country" id="country">
+								<option value="">Select</option>
+								<?php foreach($country as $countries): ?>
+								<option value="<?php echo $countries['id'];?>" <?php echo ($row['country']==$countries['id'])?'selected':'';?>><?php echo $countries['name'];?></option>
+								<?php endforeach?>
+							</select>
+						</div>
+						<div  class="form-group">
+							<label for="city" class="control-label">City</label>
+							<input class="form-control" type="text" name="city" id="city" value="<?php echo $row['city']?>"placeholder="City Name" required />
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+    </div> <!-- /modal-body -->
+    <div class="modal-footer">
+		<button type="submit" class="btn btn-success"><i class="ace-icon fa fa-check"></i>Save</button>
+        <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="ace-icon fa fa-times"></i>Cancel</button> 
+    </div>
+</form>
+<script>
+$('document').ready(function(){
+	const fv = FormValidation.formValidation(document.getElementById('#form'), {
+		fields: {
+			city: {
+				validators: {
+					notEmpty: {
+						message: 'Please provide City Name'
+					}
+				}
+			},
+			country: {
+				validators: {
+					callback: {
+						message: 'Please provide Country.',
+						callback: function(input) {
+                                return (input.value != '');
+                            }
+					}
+				}
+			},
+		},
+		plugins: {
+			trigger: new FormValidation.plugins.Trigger(),
+			bootstrap3: new FormValidation.plugins.Bootstrap3(),
+			submitButton: new FormValidation.plugins.SubmitButton(),
+			defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+		},
+	}).on('core.element.validated', function (e) {
+		if (e.valid) {
+			$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-invalid');
+			$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-valid');
+		} else {
+			$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-valid');
+			$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-invalid');
+		}
+	});
+});
+</script>

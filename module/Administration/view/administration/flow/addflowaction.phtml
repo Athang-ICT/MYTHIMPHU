@@ -1,0 +1,160 @@
+<?php 
+/**
+ * View -- of Administration/FlowController/addflowaction
+ * chophel@athang.com
+ */
+$this->headTitle($this->title);
+?>
+<form id="#form" method="post" action="<?php echo $this->url('flow', array('action' => 'addflowaction','id'=>$page)); ?>"  enctype="multipart/form-data" >                  
+    <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title"><i class="ace-icon fa fa-plus-square-o"></i> <?php echo $this->title; ?></h4>
+    </div>  <!-- /modal-header -->
+    <div class="modal-body">   
+		<div class="panel panel-default">
+			<div class="panel-body">  
+				<div class="row">
+					<div class="form-group col-md-12"> 
+						<label class="control-label" for="action">Flow Action Name</label>
+						<input type="text" class="form-control" name="action" id="action" placeholder="Flow Action Name" required /> 
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-md-4">
+						<label for="status" class="control-label">Status</label>
+						<div class="radio">
+							<label>
+								<input class="ace" type="radio" name="status" id="status" value="1" checked />
+								<span class="lbl"> Yes </span>
+							</label>
+							<label>
+								<input class="ace" type="radio" name="status" id="status" value="0" />
+								<span class="lbl"> No </span>
+							</label>
+						</div>
+					</div>
+					<div class="form-group col-md-8">
+						<label class="control-label" for="class">Button Display Class</label>
+						<select multiple="" class="form-control" name="class[]" id="class" data-placeholder="Select" >
+							<?php foreach($elements as $element):?>
+								<option value="<?php echo $element['class'];?>">
+									<?php echo $element['class'];?>
+								</option>
+							<?php endforeach;?>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-lg-12">
+						<label class="control-label" for="icon">Button Display Icon </label>
+						<div class="row">
+							<div class="col-md-6">
+								<select class="form-control" name="group" id="group" data-placeholder="Group" > 
+									<option value="-1">All</option>
+									<?php foreach($this->icongroupObj->getAll() as $group):?>
+										<option value="<?php echo $group['id'];?>">
+											<?php echo $group['icon_group'];?></option>
+									<?php endforeach;?>
+								</select>
+							</div>
+							<div class="col-md-6">
+								<select class="form-control" name="icon" id="icon" data-placeholder="Icon" > 
+									<option value="0">None</option>
+									<?php foreach($this->iconObj->getAll() as $icon_row):?>
+										<option value="<?php echo $icon_row['icon'];?>">
+											<?php echo $icon_row['icon'];?></option>
+									<?php endforeach;?>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div  class="form-group col-md-12">
+						<label for="description" class="control-label">Description</label>
+						<textarea class="form-control" type="text" name="description" id="description"></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div> <!-- /modal-body -->    
+    <div class="modal-footer">
+		<button type="submit" class="btn btn-success"><i class="ace-icon fa fa-check"></i>Save</button>
+        <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="ace-icon fa fa-times"></i>Cancel</button> 
+    </div>
+</form>
+<script>
+$(function(){
+	$('select#group').on('change',function(){
+		$.post(
+			"<?php echo $this->url('flow', array('action' => 'geticongroupchange'));?>",
+			{
+				group: $(this).val(),
+			},
+			function(data){
+				$('select#icon').html(data.icon);
+				$('select#icon').trigger('chosen:updated');
+			},
+			'json'
+		);
+	});
+	const fv = FormValidation.formValidation(document.getElementById('#form'), {
+        fields: {
+            action: {
+				validators: {
+					notEmpty: {
+						message: 'Please provide flow action.'
+					}
+				}
+			},
+			status: {
+				validators: {
+					notEmpty: {
+						message: 'Please select status.'
+					}
+				}
+			},
+			'class[]': {
+				validators: {
+					choice: {
+						min: 0,
+						max: 10,
+						message: 'Please choose 0 - 10 btn-class.',
+					},
+				}
+			},
+			group: {
+				validators: {
+					notEmpty: {
+						message: 'Please select icon group.'
+					}
+				}
+			},
+			icon: {
+				validators: {
+					notEmpty: {
+						message: 'Please select button icon.'
+					}
+				}
+			},
+        },
+        plugins: {
+            trigger: new FormValidation.plugins.Trigger(),
+            bootstrap3: new FormValidation.plugins.Bootstrap3(),
+            submitButton: new FormValidation.plugins.SubmitButton(),
+            defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+        },
+    }).on('core.element.validated', function (e) {
+		if (e.valid) {
+			$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-invalid');
+			$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-valid');
+		} else {
+			$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-valid');
+			$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-invalid');
+		}
+	});
+	$('form select').chosen().change(function () {
+		fv.revalidateField($(this).attr('name'));
+	});
+});
+</script>

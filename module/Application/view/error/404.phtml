@@ -1,0 +1,131 @@
+<?php
+/**
+ * View -- 404 Error
+ * chophel@athang.com
+ */
+    use Laminas\Mvc\Application;
+?>
+<div class="error-container">
+    <div class="well">
+        <h1 class="grey lighter smaller">
+            <span class="blue bigger-125">
+                <i class="ace-icon fa fa-sitemap"></i>
+                404
+            </span>
+            <?= $this->message ?>
+        </h1>
+        <hr />
+        <?php if (! empty($this->reason)) :
+            switch ($this->reason) {
+                case Application::ERROR_CONTROLLER_CANNOT_DISPATCH:
+                    $reasonMessage = 'The requested controller was unable to dispatch the request.';
+                    break;
+                case Application::ERROR_MIDDLEWARE_CANNOT_DISPATCH:
+                    $reasonMessage = 'The requested middleware was unable to dispatch the request.';
+                    break;
+                case Application::ERROR_CONTROLLER_NOT_FOUND:
+                    $reasonMessage = 'The requested controller could not be mapped to an existing controller class.';
+                    break;
+                case Application::ERROR_CONTROLLER_INVALID:
+                    $reasonMessage = 'The requested controller was not dispatchable.';
+                    break;
+                case Application::ERROR_ROUTER_NO_MATCH:
+                    $reasonMessage = 'The requested URL could not be matched by routing.';
+                    break;
+                default:
+                    $reasonMessage = 'We cannot determine at this time why a 404 was generated.';
+                    break;
+            }
+        ?>
+        <h3 class="lighter smaller"><?= $reasonMessage ?></h3>
+        <?php endif ?>
+        <div>
+            <?php if (! empty($this->controller)) : ?>
+            <dl>
+                <dt>Controller:</dt>
+                <dd>
+                    <?= $this->escapeHtml($this->controller) ?>
+                    <?php
+                    if (! empty($this->controller_class) && $this->controller_class != $this->controller) {
+                        printf('(resolves to %s)', $this->escapeHtml($this->controller_class));
+                    }
+                    ?>
+                </dd>
+            </dl>
+            <?php endif ?>
+
+            <div class="space"></div>
+            <?php if (! empty($this->display_exceptions)) : ?>
+                <?php if (isset($this->exception) && $this->exception instanceof \Throwable) : ?>
+            <hr/>
+
+            <h2>Additional information:</h2>
+            <h3><?= get_class($this->exception) ?></h3>
+            <dl>
+                <dt>File:</dt>
+                <dd>
+                    <pre style="background-color:#fff"><?= $this->exception->getFile() ?>:<?= $this->exception->getLine() ?></pre>
+                </dd>
+                <dt>Message:</dt>
+                <dd>
+                    <pre style="background-color:#fff"><?= $this->escapeHtml($this->exception->getMessage()) ?></pre>
+                </dd>
+                <dt>Stack trace:</dt>
+                <dd>
+                    <pre style="background-color:#fff"><?= $this->escapeHtml($this->exception->getTraceAsString()) ?></pre>
+                </dd>
+            </dl>
+
+                    <?php if ($ex = $this->exception->getPrevious()) : ?>
+            <hr/>
+
+            <h2>Previous exceptions:</h2>
+            <ul class="list-unstyled">
+                        <?php $icount = 0 ?>
+                        <?php while ($ex) : ?>
+                <li>
+                    <h3><?= get_class($ex) ?></h3>
+                    <dl>
+                        <dt>File:</dt>
+                        <dd style="background-color:#fff">
+                            <pre><?= $ex->getFile() ?>:<?= $ex->getLine() ?></pre>
+                        </dd>
+                        <dt>Message:</dt>
+                        <dd style="background-color:#fff">
+                            <pre><?= $this->escapeHtml($ex->getMessage()) ?></pre>
+                        </dd>
+                        <dt>Stack trace:</dt>
+                        <dd style="background-color:#fff">
+                            <pre><?= $this->escapeHtml($ex->getTraceAsString()) ?></pre>
+                        </dd>
+                    </dl>
+                </li>
+                            <?php
+                            $ex = $ex->getPrevious();
+                            if (++$icount >= 50) {
+                                echo '<li>There may be more exceptions, but we do not have enough memory to process it.</li>';
+                                break;
+                            }
+                            ?>
+                        <?php endwhile ?>
+            </ul>
+                    <?php endif ?>
+                <?php else : ?>
+            <h3>No Exception available</h3>
+                <?php endif ?>
+            <?php endif ?>
+        </div>
+
+        <hr />
+        <div class="center">
+            <a href="javascript:history.back()" class="btn btn-grey">
+                <i class="ace-icon fa fa-arrow-left"></i>
+                Go Back
+            </a>
+            <a href="<?php echo $this->url('home'); ?>" class="btn btn-primary">
+                <i class="ace-icon fa fa-tachometer"></i>
+                Dashboard
+            </a>
+        </div>
+    </div>
+</div>

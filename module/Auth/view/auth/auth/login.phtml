@@ -1,0 +1,110 @@
+<?php
+/**
+ * Authentication --- login
+ * singye@athang.com
+ */
+	$this->headTitle($title);
+?> 
+<div class="row">
+	<div class="col-sm-10 col-sm-offset-1">
+		<div class="login-container">	
+			<div class="space-6"></div>
+			<div class="position-relative">
+				<div id="login-box" class="login-box visible widget-box no-border">
+					<div class="widget-body">
+						<div class="widget-main">
+							<h4 class="header blue lighter bigger">
+								<i class="ace-icon fa fa-lock r"></i>
+								Please Enter Your Credentials
+							</h4>
+							<div class="space-6"></div>				
+							<form id="#form" role="form" method="post" action="<?php echo $this->url('auth', array('action' => 'login')); ?>">
+								<fieldset>
+									<div class="form-group">
+										<span class="block input-icon input-icon-right">
+											<input class="form-control" placeholder="Phone or E-mail" name="username" type="text" autofocus required >
+											<i class="ace-icon fa fa-envelope"></i>
+										</span>
+									</div>
+									<div class="form-group">
+										<span class="block input-icon input-icon-right">
+											<input class="form-control" placeholder="Password" name="password" type="password" value="" required >
+											<i class="ace-icon fa fa-key"></i>
+										</span>
+									</div>
+									<div class="space"></div>
+									<div class="clearfix">
+										<label class="inline">
+											<input type="checkbox" name="rememberme" id="rememberme" class="ace" />
+											<span class="lbl"> Remember Me</span>
+										</label>
+										<button type="submit" class="width-35 pull-right btn btn-sm btn-primary">
+											<i class="ace-icon fa fa-key"></i>
+											<span class="bigger-110">Sign In</span>
+										</button>
+									</div>
+									<div class="space-4"></div>	
+								</fieldset>
+							</form>
+						</div><!-- /.widget-main -->
+						<?php if (!empty($sso_login_url)): ?>
+						<div class="toolbar clearfix bg-info">
+							<div class="text-center">
+								<a href="<?php echo htmlspecialchars($sso_login_url); ?>" class="btn btn-sm btn-info">
+									<i class="ace-icon fa fa-sign-in"></i>
+									<span class="bigger-110">Sign In with SSO</span>
+								</a>
+							</div>
+						</div>
+						<?php endif; ?>
+						<div class="toolbar clearfix bg-danger">
+							<div>
+								<a href="<?php echo $this->url('auth', array('action' => 'forgotpwd')); ?>" data-target="#forgot-box" class="forgot-password-link ">
+									<i class="ace-icon fa fa-arrow-left"></i> I Forgot Password
+								</a>
+							</div>
+							<div>
+								<a href="#" data-target="#signup-box" class="user-signup-link">
+									More Info <i class="ace-icon fa fa-info"></i>
+								</a>
+							</div>
+						</div>
+					</div><!-- /.widget-body -->
+				</div><!-- /.login-box -->
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	document.addEventListener('DOMContentLoaded', function (e) {
+		FormValidation.formValidation(document.getElementById('#form'), {
+			fields: {
+				username: {
+					validators: {
+						notEmpty: {
+							message: 'The username is required',
+						},
+						stringLength: {
+							min: 5,
+							max: 30,
+							message: 'The username must be more than 6 and less than 30 characters long',
+						},
+					},
+				},
+				password: {
+					validators: {
+						notEmpty: {
+							message: 'The password is required',
+						},
+					},
+				},
+			},
+			plugins: {
+				trigger: new FormValidation.plugins.Trigger(),
+				bootstrap3: new FormValidation.plugins.Bootstrap3(),
+				submitButton: new FormValidation.plugins.SubmitButton(),
+				defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+			},
+		});
+	});
+</script>

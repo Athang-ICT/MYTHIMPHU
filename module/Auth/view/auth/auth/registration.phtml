@@ -1,0 +1,322 @@
+<?php
+/**
+ * Authentication --- Registration with RMA Payment Integration
+ * User registration requires successful payment verification
+ */
+$this->headTitle($title);
+$this->layout('layout/portal');
+$step = isset($step) ? $step : '1';
+?>
+<div class="container">
+	<div class="panel panel-default registration-panel">
+		<!-- Header -->
+		<div class="panel-heading">
+			<h2>
+				<i class="fa fa-credit-card"></i> Subscribe to the Basic Plan
+			</h2>
+			<p>Register and verify your payment to continue</p>
+		</div>
+		<!-- Progress Steps -->
+		<div class="progress-steps-container">
+			<div class="row text-center">
+				<div class="col-xs-6">
+					<div>
+						<i class="fa fa-circle progress-circle" style="color: <?php echo ($step == '1' || $step == '2') ? '#3498db' : '#95a5a6'; ?>;"></i>
+					</div>
+					<span class="progress-label" style="color: <?php echo ($step == '1' || $step == '2') ? '#3498db' : '#95a5a6'; ?>;">Personal Info</span>
+					<?php if ($step == '1'): ?>
+						<div class="progress-indicator"></div>
+					<?php endif; ?>
+				</div>
+				<div class="col-xs-6">
+					<div>
+						<i class="fa fa-circle progress-circle" style="color: <?php echo ($step == '2') ? '#3498db' : '#95a5a6'; ?>;"></i>
+					</div>
+					<span class="progress-label" style="color: <?php echo ($step == '2') ? '#3498db' : '#95a5a6'; ?>;">Payment</span>
+					<?php if ($step == '2'): ?>
+						<div class="progress-indicator"></div>
+					<?php endif; ?>
+				</div>
+			</div>
+		</div>
+		<!-- Panel Body -->
+	<div class="panel-body">
+		<?php if ($step == '1'): ?>
+			<form id="registrationForm" method="post" action="<?php echo $this->url('auth', array('action' => 'registration')); ?>">
+				<input type="hidden" name="link_id" value="<?php echo $this->newsId; ?>">
+
+				<!-- Personal Information Section -->
+				<h4>
+						<i class="fa fa-user"></i> Personal Information
+					</h4>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="name" class="control-label"><i class="fa fa-user"></i> Full Name *</label>
+								<input type="text" class="form-control" id="name" name="name" placeholder="Enter your full name" required>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="cid" class="control-label"><i class="fa fa-id-card"></i> Citizenship ID *</label>
+								<input type="text" class="form-control" id="cid" name="cid" placeholder="Enter CID number" required>
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="phone" class="control-label"><i class="fa fa-phone"></i> Phone Number *</label>
+								<input type="text" class="form-control" id="phone" name="phone" placeholder="17XXXXXX" required>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="email" class="control-label"><i class="fa fa-envelope"></i> Email Address *</label>
+								<input type="email" class="form-control" id="email" name="email" placeholder="your@email.com" required>
+							</div>
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="district" class="control-label"><i class="fa fa-map-marker"></i> District *</label>
+						<select class="form-control" id="district" name="Dzongkhag" required>
+							<option value="">Select your district</option>
+							<?php foreach($districts as $dis): ?>
+								<option value="<?php echo $dis['id']; ?>"><?php echo $dis['district']; ?></option>
+							<?php endforeach; ?>
+						</select>
+					</div>
+					<!-- Bank Account Section -->
+				<h4>
+						<i class="fa fa-bank"></i> Bank Account Details
+					</h4>
+					<div class="row">
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="bank_id" class="control-label"><i class="fa fa-university"></i> Select Bank for Payment *</label>
+								<select class="form-control" id="bank_id" name="bank_id" required>
+									<option value="">Select your bank</option>
+									<?php foreach($banks as $bank): ?>
+										<option value="<?php echo $bank['bank_id']; ?>"><?php echo $bank['bank']; ?></option>
+									<?php endforeach; ?>
+								</select>
+							</div>
+						</div>
+						<div class="col-md-6">
+							<div class="form-group">
+								<label for="account_number" class="control-label"><i class="fa fa-credit-card"></i> Bank Account Number *</label>
+								<input type="text" class="form-control" id="account_number" name="account_number" placeholder="Enter account number" required>
+							</div>
+						</div>
+					</div>
+					<!-- Info Alert -->
+				<div class="alert alert-info">
+					<i class="fa fa-info-circle"></i>
+					<strong> Subscription Fee:</strong> A subscription fee of <strong>Nu. 100</strong> will be processed securely through RMA. You will receive an OTP for verification. Your login credentials will be sent to your registered email after successful payment.
+				</div>
+				<!-- Submit Button -->
+				<div class="text-right">
+					<button type="submit" class="btn btn-primary">
+							<i class="fa fa-arrow-right"></i> Continue to Payment
+						</button>
+					</div>
+				</form>
+			<?php elseif ($step == '2'): ?>
+				<?php if (isset($session) && !empty($session->regData)): ?>
+					
+					<!-- Payment Verification Section -->
+					<div class="text-center">
+						<h4>
+							<i class="fa fa-shield"></i> Payment Verification
+						</h4>
+						<p>Enter the OTP sent to your registered mobile number</p>
+					</div>
+
+					<!-- Payment Summary -->
+					<div class="panel panel-info">
+						<div class="panel-body">
+							<div class="row">
+								<div class="col-xs-6"><strong>Subscription Fee:</strong></div>
+								<div class="col-xs-6 text-right">Nu. 100.00</div>
+							</div>
+							<hr>
+							<div class="row">
+								<div class="col-xs-6"><strong>Account Number:</strong></div>
+								<div class="col-xs-6 text-right">****<?php echo substr($session->regData['accountNo'], -4); ?></div>
+							</div>
+							<hr>
+							<div class="row">
+								<div class="col-xs-6"><strong>Transaction ID:</strong></div>
+								<div class="col-xs-6 text-right"><?php echo substr($session->bfsTxnId, 0, 12) . '...'; ?></div>
+							</div>
+						</div>
+					</div>
+
+					<!-- OTP Form -->
+					<form method="post" action="<?php echo $this->url('auth', array('action' => 'registration', 'id' => $this->newsId)); ?>">
+						<input type="hidden" name="step" value="2">
+
+						<div class="form-group">
+							<label for="otp" class="control-label"><i class="fa fa-lock"></i> Enter OTP *</label>
+						<input type="text" class="form-control otp-input" id="otp" name="otp" placeholder="000000" maxlength="6" pattern="[0-9]{6}" autocomplete="off" required autofocus>
+					</div>
+
+					<!-- Time Warning -->
+					<div class="alert alert-warning">
+						<i class="fa fa-clock-o"></i>
+						This OTP will expire in <strong>10 minutes</strong>.
+					</div>
+					<!-- Verify Button -->
+					<div class="text-center">
+						<button type="submit" class="btn btn-success">
+								<i class="fa fa-check-circle"></i> Verify
+							</button>
+						</div>
+					</form>
+
+				<?php else: ?>
+					<!-- Session Expired Message -->
+				<div class="alert alert-danger text-center">
+					<h4>
+						<i class="fa fa-exclamation-triangle"></i> Session Expired
+					</h4>
+					<p>Please start the process again.</p>
+					<a href="<?php echo $this->url('auth', array('action' => 'registration')); ?>" class="btn btn-primary">
+							<i class="fa fa-redo"></i> Start Over
+						</a>
+					</div>
+				<?php endif; ?>
+		<?php endif; ?>
+</div>
+
+<style>
+	/* Registration Form Styles */
+	.container {
+		padding: 40px 15px;
+	}
+
+	.registration-panel {
+		border-radius: 8px;
+		box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+		max-width: 800px;
+		margin: 0 auto;
+	}
+
+	.panel-default.registration-panel {
+		border-radius: 8px;
+	}
+
+	.registration-panel .panel-heading {
+		background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+		color: #fff;
+		padding: 30px;
+		border-radius: 8px 8px 0 0;
+		text-align: center;
+	}
+
+	.registration-panel .panel-heading h2 {
+		margin: 0;
+		font-size: 28px;
+		font-weight: bold;
+	}
+
+	.registration-panel .panel-heading p {
+		margin: 8px 0 0 0;
+		font-size: 14px;
+		opacity: 0.9;
+	}
+
+	.progress-steps-container {
+		background: #f5f5f5;
+		padding: 20px;
+		border-bottom: 1px solid #ddd;
+	}
+
+	.progress-steps-container .col-xs-6 {
+		position: relative;
+	}
+
+	.progress-steps-container .col-xs-6 > div:first-child {
+		margin-bottom: 8px;
+	}
+
+	.progress-circle {
+		font-size: 24px;
+	}
+
+	.progress-label {
+		font-size: 12px;
+		font-weight: bold;
+	}
+
+	.progress-indicator {
+		width: 100%;
+		height: 3px;
+		background: #3498db;
+		margin-top: 8px;
+		border-radius: 2px;
+	}
+
+	.registration-panel .panel-body {
+		padding: 30px;
+	}
+
+	.registration-panel h4 {
+		margin: 0 0 20px 0;
+		padding-bottom: 10px;
+		border-bottom: 2px solid #3498db;
+	}
+
+	.registration-panel h4:nth-of-type(3) {
+		margin: 30px 0 20px 0;
+	}
+
+	.otp-input {
+		text-align: center;
+		font-size: 24px;
+		letter-spacing: 8px;
+		font-weight: bold;
+	}
+
+	.alert {
+		border-radius: 6px;
+	}
+
+	.alert-info {
+		margin: 25px 0;
+	}
+
+	.alert-danger.text-center {
+		padding: 30px;
+		text-align: center;
+	}
+
+	.alert-danger.text-center h4 {
+		margin: 0 0 10px 0;
+		border: none;
+		padding-bottom: 0;
+	}
+
+	.alert-danger.text-center p {
+		margin: 0 0 20px 0;
+	}
+
+	.btn-primary,
+	.btn-success {
+		padding: 10px 30px;
+		font-weight: bold;
+	}
+</style>
+
+<script>
+	// Auto-focus on OTP input and basic validation
+	document.addEventListener('DOMContentLoaded', function() {
+		var otpInput = document.querySelector('#otp');
+		if (otpInput) {
+			otpInput.focus();
+			otpInput.addEventListener('input', function() { 
+				this.value = this.value.replace(/[^0-9]/g, ''); 
+			});
+		}
+	});
+</script>

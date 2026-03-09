@@ -1,0 +1,188 @@
+<?php 
+/**
+ * View -- of Application/IndexController/censusAction
+ * chophel@athang.com 
+ */
+	$this->headTitle($this->title);
+?>
+<div class="page-header">
+	<h1>Census Search Results </h1>
+</div>
+<div class="card">
+	<?php echo $this->tabs_helper(array(9)); ?>
+	<div class="card-header">			
+		<div class="search-area well no-margin-bottom">										
+			<form id="#form" method="post" action="<?php echo $this->url('application', array('action' => 'census')); ?>" enctype="multipart/form-data" >
+				<div class="row">
+					<div class="form-group col-md-6">
+						<div class="input-group">
+							<input type="text" class="form-control" id="cidnumber" name="cidnumber" placeholder="Search for CID Details..">
+							<div class="input-group-btn">
+								<button type="submit" class="btn btn-primary btn-sm">
+									<i class="ace-icon fa fa-search icon-on-right bigger-110"></i>
+								</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<?php 
+		if(sizeof($censusDetails) > 0 ): 
+		foreach($censusDetails as $censusDetail);
+	?>
+	<div class="row row-cards">
+		<div class="col-lg-4">
+			<div class="card">
+				<div class="card-body text-center">
+					<div class="mb-3">
+						<span class="avatar avatar-xl avatar-rounded" style="background-image: url(<?php echo 'https://www.citizenservices.gov.bt/BtImgWS/ImageServlet?type=PH&cidNo='.$censusDetail['cid'];?>)"></span>
+					</div>
+					<div class="card-title mb-1"><?php echo $censusDetail['cid']; ?></div>
+					<div class="text-muted"><?php echo $censusDetail['firstName']." ".$censusDetail['lastName']; /*".$censusDetail['middleName']."*/ ?></div>
+				</div>
+				<hr style="margin: 1rem 0;">
+			</div>
+		</div>
+		<div class="col-lg-8">
+			<div class="card">
+				<div class="card-header">
+					<h3 class="card-title">General information</h3>
+				</div>
+				<div class="card-body">
+					<dl class="row">
+						<dt class="col-5">Date of Birth</dt>
+						<dd class="col-7"><?php echo $censusDetail['dob'];?></dd>
+						<dt class="col-5">Gender</dt>
+						<dd class="col-7"><?php echo $censusDetail['gender'];?></dd>
+						<dt class="col-5">House Hold No.</dt>
+						<dd class="col-7"><?php echo $censusDetail['householdNo'];?></dd>
+						<dt class="col-5">Occupation</dt>
+						<dd class="col-7"><?php echo $censusDetail['occupation'];?></dd>
+						<dt class="col-5">Father Name</dt>
+						<dd class="col-7"><?php echo $censusDetail['fatherName'];?></dd>
+						<dt class="col-5">Mother Name</dt>
+						<dd class="col-7"><?php echo $censusDetail['motherName'];?></dd>
+						<dt class="col-5">Dzongkhag (En)</dt>
+						<dd class="col-7"><?php echo $censusDetail['dzongkhagName'];?></dd>
+						<!--<dt class="col-5">Dzongkhag (Dz)</dt>
+						<dd class="col-7"><h4><b><?php //echo $censusDetail['dzongkhagDzoName'];?></b><h4></dd>-->
+						<dt class="col-5">Gewog (En)</dt>
+						<dd class="col-7"><?php echo $censusDetail['gewogName'];?></dd>
+						<!--<dt class="col-5">Gewog (Dz)</dt>
+						<dd class="col-7"><h4><b><?php //echo $censusDetail['geogDzoName'];?></b><h4></dd>-->
+						<dt class="col-5">Village (En)</dt>
+						<dd class="col-7"><?php echo $censusDetail['villageName'];?></dd>
+						<!--<dt class="col-5">Village (Dz)</dt><dd class="col-7"><h4><b><?php //echo $censusDetail['villageDzoName'];?></b><h4></dd>-->
+						<dt class="col-5">House No.</dt>
+						<dd class="col-7"><?php echo $censusDetail['houseNo'];?></dd>
+						<dt class="col-5">Thram No.</dt>
+						<dd class="col-7"><?php echo $censusDetail['thramNo'];?></dd>
+						<dt class="col-5">Dz Full Name</dt>
+						<dd class="col-7"><h4><b><?php echo $censusDetail['firstDzoName'];//." ".$censusDetail['middleDzoName']." ".$censusDetail['lastDzoName'];?></b><h4></dd>
+					</dl>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row row-cards">
+		<div class="card-header">
+			<h3 class="card-title">Family Details of House No.: <?php echo $censusDetail['householdNo']; ?></h3>
+		</div>
+		<div class="card-body">
+		<?php if(sizeof($familyDetails) > 0 ):?>
+			<div class="table-responsive">
+				<table class="table table-sm table-bordered card-table text-wrap fs-5" id="">
+					<thead>
+						<tr>
+							<th>Full Name</th>
+							<th>CID</th>
+							<!--<th>Marital Status</th>-->
+							<th>DoB</th>
+							<th>Nationality</th>
+							<th>Gender</th>
+							<th>Father CID</th>
+							<th>Father Name</th>
+							<th>Father Nationality</th>
+							<th>Mother CID</th>
+							<th>Mother Name</th>
+							<th>Mother Nationality</th>
+						</tr>
+					</thead>
+					</tbody>
+						<?php 
+						foreach($familyDetails as $fdetails):
+						?>
+						<tr>
+							<td><?php echo $fdetails['fullName'];?></td>
+							<td><?php echo $fdetails['cid'];?></td>
+							<!--<td><?php //echo $fdetails['matitalStatus'];?></td>-->
+							<td><?php echo $fdetails['dob'];?></td>
+							<td><?php echo $fdetails['nationality'];?></td>
+							<td><?php echo $fdetails['gender'];?></td>
+							<td><?php echo $fdetails['fatherCID'];?></td>
+							<td><?php echo $fdetails['fatherName']?></td>
+							<td><?php echo $fdetails['fatherNationality'];?></td>
+							<td><?php echo $fdetails['motherCID'];?></td>
+							<td><?php echo $fdetails['motherName'];?></td>
+							<td><?php echo $fdetails['motherNationality'];?></td>
+						</tr>
+						<?php endforeach;?>
+					</tbody>
+				</table>
+			</div>
+			<?php else:?>
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="alert alert-block alert-warning">
+						Family Details Not Found.
+					</div>
+				</div>
+			</div>
+			<?php endif;?>
+		</div>
+	</div>
+	<?php else:  ?>
+	<div class="row row-cards">
+		<div class="col-lg-12">
+			<div class="card">
+				<div class="card-header">
+					<div class="alert alert-block alert-primary">
+						Please enter the Citizen ID Card No. and then press Check Census Button to view the citizen details.
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<?php endif; ?>
+</div>
+<script type="text/javascript">
+	$(function(){
+		const fv = FormValidation.formValidation(document.getElementById('#form'), {
+			fields: {
+				cidnumber: {
+					validators: {
+						notEmpty: {
+							message: 'Please provide citizen ID.'
+						},
+						integer: {
+	                        message: 'Please provide numeric values.'
+	                    },
+						stringLength: {
+							min: 11,
+							max: 11,
+							message: 'The cid no. must be 11 digits.'
+						},
+					}
+				},
+			},
+			plugins: {
+				trigger: new FormValidation.plugins.Trigger(),
+				bootstrap3: new FormValidation.plugins.Bootstrap3(),
+				submitButton: new FormValidation.plugins.SubmitButton(),
+				defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+			},
+		});
+	});
+</script>					

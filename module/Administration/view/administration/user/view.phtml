@@ -1,0 +1,153 @@
+<?php 
+/**
+ * View -- of Administration/UserController/viewAction
+ * chophel@athang.com
+ */
+	$this->headTitle($this->title);
+?>
+<?php foreach($users as $row);?>
+<div class="row">
+	<div class="col-xs-12">
+		<?php echo $this->tabs_helper(array(403,409,410),$row['id']); ?>
+		<div class="tab-content no-border padding-24">
+			<div class="row">
+				<div class="col-xs-12 col-sm-3 center">
+					<span class="profile-picture">
+					<?php //echo 'https://www.citizenservices.gov.bt/BtImgWS/ImageServlet?type=PH&cidNo='.$row['cid'];?>
+						<img class="img-responsive" alt="<?php echo $row['name']; ?>" id="avatar2" src="<?php echo $this->basePath() . '/images/avatar.jpg';?>" />
+					</span>
+					<div class="space space-4"></div>
+					<?php echo $this->button(3, $row['id']);?>
+					<?php echo $this->button(3, $row['id'],$row['status']);?>
+					<div class="space space-6"></div>
+					
+					<div class="hr hr12 dotted"></div>
+					<div class="clearfix center">
+						<div class="grid2">
+							<span class="bigger-175 blue"><?php $admin_location_array = !empty($row['admin_location']) ? explode(',', $row['admin_location']) : [];
+								echo sizeof($admin_location_array)."/".$this->locationObj->getCount(array('status'=>'1'));?>
+							</span><br>Locations Assigned
+						</div>
+						<div class="grid2">
+							<span class="bigger-175 blue"><?php $admin_activity_array = !empty($row['admin_activity']) ? explode(',', $row['admin_activity']) : [];
+								echo sizeof($admin_activity_array)."/".$this->activityObj->getCount(array('status'=>'1'));?>
+							</span><br>Activities Assigned
+						</div>
+					</div>
+					<div class="hr hr16 dotted"></div>
+					<span class="bigger-175 blue"><?php echo $row['logins'];?>
+					</span><br>No. of Logins
+					<div class="hr hr12 dotted"></div>
+				</div><!-- /.col -->
+
+				<div class="col-xs-12 col-sm-9">
+					<h4 class="blue">
+						<span class="middle"><?php echo $row['name']; ?></span>
+						<?php echo $this->status($row['status']);?>
+					</h4>
+					<div class="profile-user-info">
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Full Name </div>
+							<div class="profile-info-value">
+								<span><?php echo $row['name'];?></span>
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Citizen ID </div>
+							<div class="profile-info-value">
+								<span><?php echo $row['cid'];?></span>
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Date of Birth </div>
+							<div class="profile-info-value">
+								<span><?php echo $row['dob'];?></span>
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Location </div>
+							<div class="profile-info-value">
+								<i class="fa fa-map-marker light-orange bigger-110"></i>
+								<span><?php echo $this->regionObj->getColumn($row['region'],'region');?></span>
+								<span><?php echo $this->locationObj->getColumn($row['location'],'location');?></span>
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Email Address </div>
+							<div class="profile-info-value">
+								<span class=""><?php echo $row['email'];?></span>
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Mobile No. </div>
+							<div class="profile-info-value">
+								<span class="">+975-<?php echo $row['mobile'];?></span>
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Roles </div>
+							<div class="profile-info-value">
+								<span class=""><?php $role_array = !empty($row['role']) ? explode(',',$row['role']) : [];
+									for($i=0;$i<sizeof($role_array);$i++):?>
+									<span class="label label-info label-white middle"><?php echo ($role_array[$i]!=0)?$this->rolesObj->getColumn($role_array[$i],'role'):'-';?></span>
+									<?php endfor;?>
+								</span>
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Location Access </div>
+							<div class="profile-info-value">
+								<span class="fst-italic fs-5 grey"><?php $location_array = !empty($row['admin_location']) ? explode(',',$row['admin_location']) : [];
+									for($i=0;$i<sizeof($location_array);$i++):
+										echo ($location_array[$i]>0)?$this->locationObj->getColumn($location_array[$i],'location'):'-';
+										echo ($i != sizeof($location_array)-1)?", ":"";
+									endfor;?>
+								</span>
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Activity Access </div>
+							<div class="profile-info-value">
+								<span class="fst-italic fs-5 grey"><?php $activity_array = !empty($row['admin_activity']) ? explode(',',$row['admin_activity']) : [];
+									for($j=0;$j<sizeof($activity_array);$j++):
+										echo ($activity_array[$j]>0)?$this->activityObj->getColumn($activity_array[$j],'activity'):'-';
+										echo ($j != sizeof($activity_array)-1)?", ":"";
+									endfor;?></span>
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Joined </div>
+							<div class="profile-info-value">
+								<span class=""><?php echo $row['created'];?></span>
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Last Login </div>
+							<div class="profile-info-value">
+								<span class=""><?php echo $row['last_login'];?></span>
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Last Logout </div>
+							<div class="profile-info-value">
+								<span class=""><?php echo $row['last_logout'];?></span>
+							</div>
+						</div>
+						<div class="profile-info-row">
+							<div class="profile-info-name"> Last Accessed IP </div>
+							<div class="profile-info-value">
+								<span class=""><?php echo ($row['last_accessed_ip']=='::1')?'localhost-Dev':$row['last_accessed_ip'];?></span>
+							</div>
+						</div>
+					</div>
+				</div><!-- /.col -->
+			</div><!-- /.row -->
+		</div>
+	</div><!-- /.col -->
+</div><!-- /.row -->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->						

@@ -1,0 +1,148 @@
+<?php
+/**
+ * View -- of Sales/SaleController/indexAction
+ */
+$this->headTitle($this->title);    
+?>
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+        <form id="form" method="post" action="<?php echo $this->url('user', array('action' => 'individual', 'id' => $user)); ?>" enctype="multipart/form-data">
+                <div class="form-group col-lg-2">
+                    <label class="control-label" for="year">Year</label>
+                    <select class="form-control" id="year" name="year" data-placeholder="Select">
+                        <option value=""></option>
+                        <?php 
+                            for ($year = date('Y'); $year >= $data['minYear']; $year--):
+                                $selected = ($year == $data['year']) ? "selected" : "";
+                        ?>
+                            <option value="<?php echo $year; ?>" <?php echo $selected; ?>>
+                                <?php echo $year; ?> 
+                            </option>
+                        <?php endfor; ?>
+                    </select>
+                </div>
+                <div class="form-group col-lg-2">
+                    <label class="control-label" for="month">Month</label>
+                    <select class="form-control" id="month" name="month" data-placeholder="Select">
+                        <option value="-1" <?php echo ($data['month'] == '-1') ? 'selected' : ''; ?>>All</option>
+                        <?php for ($month = 1; $month <= 12; $month++): ?>
+                            <?php $selected = ($month == $data['month']) ? 'selected' : ''; ?>
+                            <option value="<?php echo $month; ?>" <?php echo $selected; ?>>
+                                <?php echo DateTime::createFromFormat('!m', $month)->format('F'); ?>
+                            </option> 
+                        <?php endfor; ?>
+                    </select>
+                </div>
+                <div class="col-lg-6">
+                    <div class="space-12"></div>
+                    <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-refresh"></i> Generate </button>
+                </div>
+
+                <div class="col-lg-2">
+                    <div class="clearfix">
+                        <div class="pull-right tableTools-container"></div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="card-body">
+        <div>
+            <table class="table table-bordered table-striped table-hover" id="dataTables">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>User</th>
+                        <th>Date</th>
+                        <th>Entry</th>
+                        <th>Late Reason</th>
+                        <th>Leave Office</th>
+                        <th>Early Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    
+                <?php 
+                $currentYear = (int)date('Y');
+                $currentMonth = (int)date('m');
+                $currentdate = (int)date('d');
+                if($data['month']== $currentMonth  && $data['year']==$currentYear):
+                $day= $currentdate;
+                else:
+                    $day=$lastday;
+                endif;
+               // print_r((int)date('d'));
+                for ($i = $day; $i >= 1; $i--):
+                    $attendanceData = $this->attendance->getDateWise('date', $data['year'], $data['month'], $i, $user);
+                    if (!empty($attendanceData)) {
+                        foreach ($attendanceData as $att):
+                ?>
+                    <tr>
+                        <td><?php echo $i; ?></td>
+                        <td><?php echo $this->usersObj->getColumn($user, 'name'); ?></td>
+                        <td><?php echo $data['year'] . '-' . $data['month'] . '-' . $i; ?></td>
+                        <?php if (empty($att)): ?>
+                            <td style="background-color:red;">Absent</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        <?php else: ?>
+                            <?php if ($att['entry'] <= '09:15:00'): ?>
+                                <td style="background-color:#3F9B0B;"><?php echo $att['entry']; ?></td>
+                            <?php else: ?>
+                                <td style="background-color:#FFD801;"><?php echo $att['entry']; ?></td>
+                            <?php endif; ?>
+                            <td>
+                                <?php if ($att['entry'] >= '09:15:00' && empty($att['late_reason']) && $att['date'] == date('Y-m-d')): ?>
+                                    <a class="btn btn-xs btn-primary" data-target="#modal" data-toggle="modal" href="<?php echo $this->url('user', array('action' => 'late', 'id' => $att['id'])); ?>">
+                                        Reason for late 
+                                    </a>
+                                <?php else: echo $att['late_reason']; endif; ?>
+                            </td>
+                            <?php if ($att['exit'] >= $timing): ?>
+                                <td style="background-color:#3F9B0B;"><?php echo $att['exit']; ?></td>
+                            <?php elseif (is_null($att['exit'])): ?>
+                                <td></td>
+                            <?php else: ?>
+                                <td style="background-color:#FFD801;"><?php echo $att['exit']; ?></td>
+                            <?php endif; ?>
+                            <td>
+                                <?php if ($att['exit'] < $timing && !is_null($att['exit']) && empty($att['early_reason']) && $att['date'] == date('Y-m-d')): ?>
+                                    <a class="btn btn-xs btn-primary" data-target="#modal" data-toggle="modal" href="<?php echo $this->url('user', array('action' => 'early', 'id' => $att['id'])); ?>">
+                                        Reason for early leaving 
+                                    </a>
+                                <?php else: echo $att['early_reason']; endif; ?>
+                            </td>
+                        <?php endif; ?>
+                    </tr>
+                    <?php endforeach; 
+                    } else { ?>
+                    <tr>
+                        <td><?php echo $i; ?></td>
+                        <td><?php echo $this->usersObj->getColumn($user, 'name'); ?></td>
+                        <td><?php echo $data['year'] . '-' . $data['month'] . '-' . $i; ?></td>
+                        <td style="background-color:red;">Absent</td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <?php } ?>
+                <?php endfor; ?>
+                </tbody>    
+            </table>
+        </div>
+    </div>
+</div>
+<div id="modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content"> </div>
+    </div>
+</div>
+<script>    
+$('document').ready(function(){
+    $('#dataTables').DataTable({
+        "paging":   true,
+    });
+});
+</script>

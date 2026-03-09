@@ -1,0 +1,20 @@
+<?php // view partial.phtml 
+  $daily = ($this->active == "daily")?"active":"";
+  $monthly = ($this->active == "monthly")?"active":"";
+?>
+<br/>
+<ul class="nav nav-tabs padding-18" id="myTab" >
+	<li class="<?php echo $daily; ?>">
+		<a href="<?php echo $this->url('user', array('action' => 'viewattendance')); ?>">
+			<i class="green ace-icon fa fa-eye bigger-120"> </i>
+			<span class="hidden-xs" >Daily Attendance</span>
+		</a>
+	</li>
+	<li class="<?php echo $monthly; ?>">
+		<a href="<?php echo $this->url('user', array('action' => 'monthly')); ?>">
+			<i class="orange ace-icon fa fa-user bigger-120"> </i>
+			<span class="hidden-xs" >Monthly Attendance</span>
+		</a>
+	</li>
+</ul>
+

@@ -1,0 +1,187 @@
+<?php
+/**
+ * View -- of Application/IndexController/panel1Action
+ * chophel@athang.com
+ */
+	$this->headTitle($title);
+?>
+<div class="page-header">
+    <div class ="row">
+		<div class ="col-lg-6">
+			<h1>Admin Dashboard</h1>
+		</div>
+	</div>
+</div><!-- /.page-header -->
+<div class="row">
+	<div class="col-sm-6">
+		<div class="widget-box">
+			<div class="widget-header widget-header-flat widget-header-small">
+				<?php
+					$total_space = disk_total_space(".");
+					$free_space = disk_free_space(".");
+					$si_prefix = array( 'B', 'KB', 'MB', 'GB', 'TB', 'EB', 'ZB', 'YB' );
+					$base = 1024;
+					$total_space_class = min((int)log($total_space , $base) , count($si_prefix) - 1);
+					$total_space = sprintf('%1.2f' , $total_space / pow($base,$total_space_class));
+					$free_space = sprintf('%1.2f' , $free_space / pow($base,$total_space_class));
+					$used_space = $total_space - $free_space;
+					$free_space_percent = round(($free_space*100)/$total_space,2);
+					$used_space_percent = round(($used_space*100)/$total_space,2);
+					$storage_uom = $si_prefix[$total_space_class];
+					/** Directory Size */
+					function folderSize ($dir)
+					{
+						$size = 0;
+						foreach (glob(rtrim($dir, '/').'/*', GLOB_NOSORT) as $each) {
+							$size += is_file($each) ? filesize($each) : folderSize($each);
+						}
+						return $size;
+					}
+					$erpsystem_space = folderSize("C:/xampp/htdocs/monal/");
+					$erpsystem_upload_space = folderSize("C:/xampp/htdocs/monal/data/upload/");
+					$erpsystem_public_upload_space = folderSize("C:/xampp/htdocs/monal/public/upload/");
+
+					$erp_space_class = min((int)log($erpsystem_space , $base) , count($si_prefix) - 1);
+
+					$erpsystem_space = sprintf('%1.2f' , $erpsystem_space / pow($base,$erp_space_class));
+					$erpsystem_upload_space = sprintf('%1.2f' , $erpsystem_upload_space / pow($base,$erp_space_class));
+					$erpsystem_public_upload_space = sprintf('%1.2f' , $erpsystem_public_upload_space / pow($base,$erp_space_class));
+
+					$erp_uom = $si_prefix[$erp_space_class];
+				?>
+				<h5 class="widget-title">
+					<i class="ace-icon fa fa-desktop"></i>File System:
+				</h5>
+				Using <strong><?php echo $used_space." ".$storage_uom;?></strong> of <?php echo $total_space." ".$storage_uom;?>
+			</div>
+			<div class="widget-body">
+				<div class="widget-main">
+					<div class="row">
+						<div class="col-xs-12">
+							<div class="progress progress-striped pos-rel" data-percent="<?php echo $used_space_percent;?>%">
+								<div class="progress-bar" style="width:<?php echo $used_space_percent;?>%;"></div>
+							</div>
+						</div><!-- /.col -->
+					</div><!-- /.row -->
+					<div class="row">
+						<div class="col-xs-4">
+							<i class="ace-icon fa fa-square red"></i>
+							<span>Total Space: <?php echo $total_space." ".$storage_uom;?></span>
+						</div>
+						<div class="col-xs-4">
+							<i class="ace-icon fa fa-square blue"></i>
+							<span>Used Space: <?php echo $used_space." ".$storage_uom;?></span>
+						</div>
+						<div class="col-xs-4">
+							<i class="ace-icon fa fa-square grey"></i>
+							<span>Free Space: <?php echo $free_space." ".$storage_uom;?></span>
+						</div>
+					</div>
+					<div class="space-6"></div>
+					<div class="row">
+						<div class="col-xs-12">
+							<table class="table table-condensed table-bordered">
+								<tbody>
+									<tr>
+										<th class="success" style="width:35%">Server Name</th>
+										<td><?php echo $_SERVER['SERVER_NAME'];?></td>
+									</tr>
+									<tr>
+										<th class="success" style="width:35%">HTTP Host</th>
+										<td><?php echo $_SERVER['HTTP_HOST'];?></td>
+									</tr>
+									<tr>
+										<th class="success" style="width:35%">Remote Client Address</th>
+										<td><?php echo $_SERVER['REMOTE_ADDR'];?></td>
+									</tr>
+									<tr>
+										<th class="warning" style="width:35%">ERP System Directory Size</th>
+										<td><?php echo $erpsystem_space." ".$erp_uom;?></td>
+									</tr>
+									<tr>
+										<th class="warning" style="width:35%">Document Directory Size</th>
+										<td><?php echo $erpsystem_upload_space." ".$erp_uom;?></td>
+									</tr>
+									<tr>
+										<th class="warning" style="width:35%">Public Directory Size</th>
+										<td><?php echo $erpsystem_public_upload_space." ".$erp_uom;?></td>
+									</tr>
+								</body>
+							</table>	
+						</div>
+					</div>
+				</div><!-- /.widget-main -->
+			</div><!-- /.widget-body -->
+		</div><!-- /.widget-box -->
+	</div><!-- /.col -->
+	<div class="col-sm-6">
+		<div class="widget-box">
+			<div class="widget-header widget-header-flat widget-header-small">
+				<h5 class="widget-title">
+					<i class="ace-icon fa fa-sign-in"></i>Login Traffic
+				</h5>
+			</div>
+			<div class="widget-body">
+				<div class="widget-main">
+					<div class="row">
+						<div class="col-xs-12">
+						<div id="chart1" class="canvas-chart"></div>
+						<?php $Chart1Points = "";
+							$Login_Traffic = array();
+							foreach($logintraffics as $logintraffic):
+								array_push($Login_Traffic, array("x"=> $logintraffic['month'], "y"=>$logintraffic['logins']));
+							endforeach;
+							$Chart1Points = "{type: 'area', dataPoints: ".json_encode($Login_Traffic,JSON_NUMERIC_CHECK)."}";
+							
+							$axisX = "Last 12 Month"; 
+							$axisY = "No. of Logins"; 
+							echo $this->canvas('chart1',$Chart1Points,'',$axisX,$axisY);?>
+						</div><!-- /.col -->
+					</div><!-- /.row -->
+				</div><!-- /.widget-main -->
+			</div><!-- /.widget-body -->
+		</div><!-- /.widget-box -->
+	</div><!-- /.col -->
+</div><!-- /.row -->
+<hr>
+<div class="row">
+	<div class="col-lg-12">
+		<?php foreach($this->menus as $menu):?>
+			<div class="monal_dashboard_menu" >
+				<div class="app_icon"  style="background-color:<?php echo $menu['color'];?>" data-url="<?php echo $this->url($menu['route']);?>" >
+					<i class="<?php echo $menu['icon'];?> fa-3x"></i>
+				</div>
+				<div class="small">
+					<?php echo $menu['menu'];?>
+				</div>
+			</div>
+		<?php endforeach;?>
+	</div>
+</div>
+<hr>
+<div class="row">
+	<div class="col-sm-6">
+		<div class="widget-box">
+			<div class="widget-header widget-header-flat widget-header-small">
+				<h5 class="widget-title">
+					<i class="ace-icon fa fa-map"></i>Geo Reference
+				</h5>
+			</div>
+			<div class="widget-body">
+				<div class="widget-main">
+					<div id="map" class="leaflet-map"></div>
+					<?php $districts = $this->districtObj->getAll();
+						$locations = $this->locationObj->get(array('status'=>'1'));
+						echo $this->leaflet('map', $districts, $locations, $this->basePath());?>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	$('.app_icon').each(function(){
+		$(this).bind('click',function(){
+			location.href=$(this).attr('data-url');
+		});
+	});
+</script>

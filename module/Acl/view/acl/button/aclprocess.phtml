@@ -1,0 +1,87 @@
+<?php 
+/**
+ * chophel@athang.com 
+ * View -- of Acl/ButtonController/aclprocessAction
+ */
+	$this->headTitle($this->title);
+?>
+<?php echo $this->tabs_helper(array(232,234,236,238)); ?>
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<div class="col-lg-6">
+				<form method="POST" class="form-horizontal">
+					<div class="form-group row">
+						<label class="control-label col-sm-4">Module</label>
+						<div class="col-sm-8">
+							<select id="module" name="module" class="form-control" data-placeholder="Select">
+								<?php foreach($this->modules as $module):?>
+								<?php $selected = ($module['id']==$this->resource)?'selected':'';?>
+									<option value="<?php echo $module['id']?>"<?php echo $selected;?>><?php echo $module['module'];?></option>
+								<?php endforeach;?>
+							</select>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="table-responsive">
+		<table class="table card-table text-nowrap" id="dataTables">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Process</th>
+					<th>Location</th>
+					<th>Activity</th>
+					<th>Only If Creator</th>	
+					<th>Status</th>
+					<th>Permission Levels</th>
+					<?php if($this->button(1)!=""):?>
+					<th class='no-sort'>Action</th>
+					<?php endif;?>
+				</tr>
+			</thead>
+			<tbody>
+			<?php $i=1+(($page-1)*20); foreach ($paginator as $row):?>
+				<tr>
+					<td><?php echo $i++; ?></td>		
+					<td><?php echo $row['process']; ?></td>
+					<td class="text-center"><?php echo ($row['location']=='1')?"<span class='ace-icon fa fa-check fa-lg green'></span>":"<span class='ace-icon fa fa-times fa-lg red'></span>"; ?></td>
+					<td class="text-center"><?php echo ($row['activity']=='1')?"<span class='ace-icon fa fa-check fa-lg green'></span>":"<span class='ace-icon fa fa-times fa-lg red'></span>"; ?></td>
+					<td class="text-center"><?php echo ($row['only_if_creator']=='1')?"<span class='ace-icon fa fa-check fa-lg green'></span>":"<span class='ace-icon fa fa-times fa-lg red'></span>"; ?></td>
+					<td class="text-center"><?php echo ($row['status']=='1')?"<span class='ace-icon fa fa-check fa-lg green'></span>":"<span class='ace-icon fa fa-times fa-lg red'></span>"; ?></td>
+					<td><?php 
+						if(!empty($row['permission_level'])):
+							$status_array = !empty($row['permission_level']) ? explode(',',$row['permission_level']) : [];
+							for($i=0;$i<sizeof($status_array);$i++):
+								echo $this->status($status_array[$i])."&nbsp;";
+						endfor;else: echo "-"; endif;?></td>
+					<?php if($this->button(1)!=""):?>
+					<td><?php echo $this->button(1, $row['id'].'_'.$page);?></td>
+					<?php endif;?>
+				</tr>
+				<?php endforeach; ?>
+			</tbody>
+		</table>
+	</div>
+	<div class="card-footer d-flex align-items-center">
+		<?php echo $this->paginationControl($this->paginator,'Sliding','acl_pagination.phtml', 
+			array('route' => 'button/paginator','action'=>'aclprocess','id'=>$this->resource,'role'=>'0','task'=>'0'));?>
+	</div>
+</div>
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+$('document').ready(function(){
+	$('#module').change(function(){
+		window.location.href="<?php echo $this->url('button',array('action'=>'aclprocess'));?>/"+$(this).val();
+	});
+	$('#dataTables').DataTable();
+});
+</script>
+   

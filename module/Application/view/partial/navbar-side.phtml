@@ -1,0 +1,117 @@
+<?php
+/**
+ * Layout --- Side Navbar
+ * chophel@athang.com
+ */
+?>
+<?php 
+	$getRoute = $this->getroute_helper()->getMatchedRouteName();
+	$getAction = $this->getroute_helper()->getParam('action');
+	$arr = explode('/', $getRoute);
+	$getRoute = $arr[0];
+	$getResource = $this->getresource_helper($getRoute);
+?>	
+<div id="sidebar" class="sidebar responsive ace-save-state sidebar-fixed sidebar-scroll">
+	<div class="sidebar-shortcuts" id="sidebar-shortcuts">
+		<div class="sidebar-shortcuts-large" id="sidebar-shortcuts-large">
+			<button class="btn btn-success">
+				<i class="ace-icon fa fa-signal"></i>
+			</button>
+			<button class="btn btn-info">
+				<i class="ace-icon fa fa-pencil"></i>
+			</button>
+			<button class="btn btn-warning">
+				<i class="ace-icon fa fa-users"></i>
+			</button>
+			<button class="btn btn-danger">
+				<i class="ace-icon fa fa-cogs"></i>
+			</button>
+		</div>
+
+		<div class="sidebar-shortcuts-mini" id="sidebar-shortcuts-mini">
+			<span class="btn btn-success"></span>
+			<span class="btn btn-info"></span>
+			<span class="btn btn-warning"></span>
+			<span class="btn btn-danger"></span>
+		</div>
+	</div><!-- /.sidebar-shortcuts -->
+	<ul class="nav nav-list">
+		<?php if($this->menu_helper()!==null): foreach ( $this->menu_helper() as $key=>$menu): ?>
+			<?php  extract($menu); ?>
+			<?php if ( !is_array($menuItems) ): ?>
+				<li class="<?php echo ($getRoute == $route)?"active":"";?>  highlight">
+					<a href="<?php echo $this->url($route, array('action' => $action)); ?>" title="<?php echo $menu; ?>">
+						<i class="menu-icon <?php echo $icon; ?>"></i>
+						<span class="menu-text"> <?php echo $menu; ?> </span>
+						<b class="arrow"></b>
+					</a>
+				</li> 
+			<?php else: ?>
+				<?php $condition = ($getResource == $this->getresource_helper($route));?>
+				<li class="<?php echo ($condition)?"open active":"";?> highlight">
+					<a class="dropdown-toggle" href="#" title="<?php echo $menu; ?>">
+						<i class="menu-icon <?php echo $icon; ?>"></i>
+						<span class="menu-text"> <?php echo $menu; ?> </span>
+						<b class="arrow fa fa-angle-down"></b>
+					</a>
+					<b class="arrow"></b>
+					
+					<ul class="submenu">
+						<?php foreach ($menuItems as $key=>$menuitem): ?>
+							<?php extract($menuitem); ?>		                     
+							<?php if(!is_array($submenuItems)):?>
+							<?php 
+								$condition1 = ($getResource == $this->getresource_helper($route));
+								$condition2 = ($getRoute == $route);
+							?>
+								<li class="<?php echo ($condition1 && $condition2)?"active":"";?>">
+									<a href="<?php echo $this->url($route); ?>" title="<?php echo $menu; ?>">
+										<i class="menu-icon fa fa-caret-right"></i>
+										<?php echo $menu; ?>
+									</a>
+								</li>
+							<?php else: ?>
+								<?php 
+									$condition1 = ($getResource == $this->getresource_helper($route));
+									$condition2 = ($getRoute == $route);
+								?>
+								<li class="<?php echo ($condition1 && $condition2)?"open active":"";?>">
+									<a class="dropdown-toggle" href="#">
+										<b class="arrow"></b>
+										<i class="menu-icon fa fa-caret-right"></i>
+										<?php echo $menu; ?>
+										<b class="arrow fa fa-angle-down"></b>
+									</a>
+									<b class="arrow"></b>
+									<ul class="submenu">
+										<?php foreach ($submenuItems as $submenuItem):?>
+											<?php 
+												$condition1 = ($getResource == $this->getresource_helper($route));
+												$condition2 = ($getRoute == $route);
+												$condition3 = ($getAction == $submenuItem['action']);
+											?>
+											<li class="<?php echo ($condition1 && $condition2 && $condition3)?"active":"";?>"> 
+												<a href="<?php echo $this->url($route, array('action' => $submenuItem['action'])); ?>">
+													<i class="menu-icon fa fa-caret-right"></i>
+													<?php echo $submenuItem['menu']; ?>
+												</a>
+												<b class="arrow"></b>
+											</li>
+										<?php endforeach;?>
+									</ul>
+									<!-- /.nav-second-level -->
+								</li>
+							<?php endif; ?>   
+						<?php endforeach;?>  
+					 </ul> 
+				</li>
+			<?php endif; ?>				
+		<?php endforeach; endif;?>
+	</ul><!-- /.nav-list -->
+	<div class="sidebar-toggle sidebar-collapse" id="sidebar-collapse">
+		<i id="sidebar-toggle-icon" class="ace-icon fa fa-angle-double-left ace-save-state" data-icon1="ace-icon fa fa-angle-double-left" data-icon2="ace-icon fa fa-angle-double-right"></i>
+	</div>
+	<script type="text/javascript">
+		try{ace.settings.check('sidebar','collapsed')}catch(e){}
+	</script>
+</div>

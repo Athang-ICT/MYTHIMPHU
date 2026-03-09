@@ -1,0 +1,84 @@
+<?php
+/**
+ * View -- of Administration/MasterController/departmentAction
+ * chophel@athang.com
+ */
+	$this->headTitle($this->title);
+?>
+<?php echo $this->tabs_helper(array(422,425,428,431,434,437)); ?>
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+			<div class="col-lg-9">
+				<form method="POST">    
+					<div class="row">
+						<div class="form-group col-lg-4">
+							<label for="department" class="control-label">Department</label>
+							<select id="department" name="department" class="form-control" data-placeholder="Select">
+								<option value="-1" <?php echo ($department_id == '-1')?'selected':'';?>>All</option>
+								<?php foreach($this->departmentObj->get(array('status'=>'1')) as $department):?>
+									<option value="<?php echo $department['id']?>"<?php echo ($department['id']==$department_id)?'selected':'';?>>
+										<?php echo $department['department'];?></option>
+								<?php endforeach;?>
+							</select>
+						</div>
+					</div>
+				</form>
+			</div>
+			<div class="col-lg-3 ">
+				<div class="space"></div>
+				<div class="btn-group pull-right">
+					<?php echo $this->button(2,$page);?>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="table-responsive">
+		<table class="table card-table text-nowrap" id="dataTables">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>Activity</th>
+					<th>Prefix</th>
+					<th>Department</th>
+					<th>Status</th>
+					<?php if($this->button(1)!=""):?>
+						<th class="no-sort no-printpdf">Action</th>
+					<?php endif;?>	
+				</tr>
+			</thead>
+			<tbody>
+				<?php $i=1+(($page-1)*20); foreach ($paginator as $row):?>
+					<tr>
+						<td><?php echo $i++; ?> </td>
+						<td><b><?php echo $row['activity']; ?></b></td>
+						<td><?php echo $row['prefix']; ?></td>
+						<td><?php echo $this->departmentObj->getColumn($row['department'],'department'); ?></td>
+						<td><?php echo $this->status($row['status']); ?></td>
+						<?php if($this->button(1)!=""):?>
+							<td><?php echo $this->button(1, $row['id'].'_'.$page);?></td>
+						<?php endif;?>
+					</tr>
+				<?php endforeach;?>
+			</tbody>
+		</table>
+	</div>
+	<div class="card-footer d-flex align-items-center">
+		<?php echo $this->paginationControl($this->paginator,'Sliding','adm_pagination.phtml', 
+			array('route' => 'setmaster/paginator','action'=>'activity','id'=>$department_id));?>
+	</div>
+</div>
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+$('document').ready(function(){
+	$('#department').change(function(){
+		window.location.href="<?php echo $this->url('setmaster',array('action'=>'activity'));?>/"+$(this).val();
+	});
+	$('#dataTables').DataTable();
+});
+</script>

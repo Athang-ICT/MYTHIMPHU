@@ -1,0 +1,86 @@
+<?php
+/**
+ * @var Laminas\View\Renderer\PhpRenderer $this
+ * chophel@athang.com
+ */
+?>
+<?= $this->doctype() ?>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <?= $this->headTitle('mythimphu')->setSeparator(' - ')->setAutoEscape(false) ?>
+
+        <?= $this->headMeta()
+            ->appendName('viewport', 'width=device-width, initial-scale=1.0, viewport-fit=cover')
+            ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
+        ?>
+		
+        <!-- Le styles -->
+        <?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/images/favicon.png'))
+		
+			->prependStylesheet($this->basePath() . '/css/athang.css')
+			->prependStylesheet($this->basePath() . '/leaflet.fullscreen/leaflet.fullscreen.css')
+			->prependStylesheet($this->basePath() . '/leaflet/leaflet.css')
+			->prependStylesheet($this->basePath() . '/css/select2.min.css')
+			->prependStylesheet($this->basePath() . '/css/toastr.min.css')
+			->prependStylesheet($this->basePath() . '/css/formValidation.min.css')
+			->prependStylesheet($this->basePath() . '/css/fonts.googleapis.com.css')
+			->prependStylesheet($this->basePath() . '/font-awesome/css/font-awesome.min.css')
+			->prependStylesheet($this->basePath() . '/css/monal.min.css')
+			->prependStylesheet($this->basePath() . '/dataTables/datatables.min.css')
+			->prependStylesheet($this->basePath() . '/css/bootstrap-datepicker3.min.css')
+			->prependStylesheet($this->basePath() . '/css/bootstrap.min.css');
+        ?> 
+                  
+       <!-- Scripts -->
+        <?php echo $this->headScript()
+			->prependFile($this->basePath() . '/js/ch_addrow.js')
+			->prependFile($this->basePath() . '/js/athang.js')
+			->prependFile($this->basePath() . '/js/canvasjs.min.js')
+			->prependFile($this->basePath() . '/js/select2.min.js')
+			->prependFile($this->basePath() . '/leaflet.fullscreen/Leaflet.fullscreen.min.js')
+			->prependFile($this->basePath() . '/leaflet/leaflet.js')
+			->prependFile($this->basePath() . '/js/toastr.min.js')
+			//->prependFile($this->basePath() . '/js/PasswordStrength.min.js')
+			->prependFile($this->basePath() . '/js/FormValidationBootstrap3.min.js')
+			->prependFile($this->basePath() . '/js/FormValidation.min.js')
+			->prependFile($this->basePath() . '/zxcvbnv4.4.2/zxcvbn.js')
+			->prependFile($this->basePath() . '/js/monal-elements.min.js')
+			->prependFile($this->basePath() . '/js/monal.min.js')									
+			->prependFile($this->basePath() . '/js/monal-extra.min.js')
+			->prependFile($this->basePath() . '/dataTables/datatables.min.js')
+			->prependFile($this->basePath() . '/js/chosen.jquery.min.js')
+			->prependFile($this->basePath() . '/js/bootstrap-datepicker.min.js')
+			->prependFile($this->basePath() . '/js/bootstrap.min.js')
+			->prependFile($this->basePath() . '/js/print.js')
+			->prependFile($this->basePath() . '/js/jquery-2.2.4.min.js')
+			->prependFile($this->basePath() . '/tinymce/tinymce.min.js');?>
+    </head>
+	<body class="<?php echo ($user = $this->Identity())?'no-skin':'login-layout light-login patern-bg';?>">
+		<?php if ($user = $this->Identity()) {  ?>
+			<!-- topbar menu  -->    
+			<?php echo $this->partial('partial/navbar-top.phtml'); ?>
+		<?php } ?> 
+		<div class="main-container ace-save-state" id="main-container">
+			<?php if ($user = $this->Identity()) {  ?>  
+				<!-- sidebar menu  -->  
+				<?php echo $this->partial('partial/navbar-side.phtml'); ?>                
+			<?php } ?>  	 
+			<div class="main-content">
+				<div class="main-content-inner">
+					<?php if ($user = $this->Identity()) {  ?> 
+						<!-- breadcrumb  --> 
+						<?php echo $this->partial('partial/breadcrumb.phtml'); ?>    	
+						<div class="page-content">
+					<?php }?>
+							<?php echo $this->content; ?>  
+							<?php echo $this->flashmessage();?>
+					<?php if ($user = $this->Identity()) {  ?>   
+						</div><!-- /.page-content -->
+					<?php }?>
+				</div>
+			</div><!-- /.main-content -->
+			<?php echo $this->partial('partial/navbar-bottom.phtml'); ?>
+		</div><!-- /.main-container -->
+	</body>
+</html>

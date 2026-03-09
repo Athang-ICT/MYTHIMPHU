@@ -1,0 +1,171 @@
+<?php
+/**
+ * Authentication --- amendpwd
+ * chophel@athang.com
+ */
+	$this->headTitle($title);
+?> 
+<div class="row">
+	<div class="col-sm-10 col-sm-offset-1">
+		<div class="login-container">
+			<div class="center">
+				<h1>
+					<img style="height:100px"src="<?php echo $this->basePath() . '/images/logo.png' ?> "/>
+				</h1>
+				<h3 class="blue" id="id-company-text">
+					&copy;<span class="red"> Bhutan Post</span><span id="id-text2"> ERP-System</span>
+				</h3>
+			</div>			
+			<div class="space-6"></div>
+			<div class="position-relative">
+				<div id="signup-box" class="signup-box visible widget-box no-border">
+					<div class="widget-body">
+						<div class="widget-main">
+							<h4 class="header green lighter bigger">
+								<i class="ace-icon fa fa-user-circle green"></i>
+								Password Recovery
+							</h4>
+							<div class="space-6"></div>	
+							<p> Enter your details to begin: </p>			
+							<form id="#form" role="form" method="post" action="<?php echo $this->url('auth', array('action' => 'amendpwd')); ?>">
+								<input type="hidden" name="recovery_id" id="recovery_id" value="<?php echo $this->email;?>" />
+								<fieldset>
+									<div class="form-group">
+										<span class="block input-icon input-icon-right">
+											<input class="form-control" placeholder="E-mail" name="email" id="email" type="text" autofocus required >
+											<i class="ace-icon fa fa-envelope"></i>
+										</span>
+									</div>
+									<div class="form-group">
+										<span class="block input-icon input-icon-right">
+											<input class="form-control" placeholder="New Password" name="new_password" id="new_password" type="password" value="" required >
+											<i id="showpwd" class="ace-icon fa fa-eye-slash blue"></i>
+										</span>
+									</div>
+									<div class="progress progress-mini">
+										<div id="passwordMeter" class="progress-bar" style=""></div>
+									</div>
+									<div class="form-group">
+										<span class="block input-icon input-icon-right">
+											<input class="form-control" placeholder="Confrim New Password" name="confirm_password" id="confirm_password" type="password" value="" required >
+											<i class="ace-icon fa fa-retweet"></i>
+										</span>
+									</div>
+									<div class="space"></div>
+									<div class="clearfix">
+										<button type="submit" class="width-35 pull-right btn btn-sm btn-success">
+											<i class="ace-icon fa fa-key"></i>
+											<span class="bigger-110">Submit</span>
+										</button>
+									</div>
+									
+								</fieldset>
+							</form>
+						</div><!-- /.widget-main -->
+						<div class="toolbar center">
+							<a href="<?php echo $this->url('auth', array('action' => 'login')); ?>" data-target="#login-box" class="back-to-login-link">
+								Back to login
+								<i class="ace-icon fa fa-arrow-right"></i>
+							</a>
+						</div>
+					</div><!-- /.widget-body -->
+				</div><!-- /.login-box -->
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	document.addEventListener('DOMContentLoaded', function (e) {
+		$('i#showpwd').on('click',function(){
+			if($('input#new_password').attr('type')=='password'){
+				$('input#new_password').attr('type','text');
+				$(this).attr('class', 'ace-icon fa fa-eye blue');
+			}else{
+				$('input#new_password').attr('type','password');
+				$(this).attr('class', 'ace-icon fa fa-eye-slash blue');
+			}
+		});
+		const form = document.getElementById('#form');
+		const passwordMeter = document.getElementById('passwordMeter');
+
+		const randomNumber = function (min, max) {
+			return Math.floor(Math.random() * (max - min + 1) + min);
+		};
+
+		const fv = FormValidation.formValidation(form,{
+			fields: {
+				email: {
+					validators: {
+						notEmpty: {
+							message: 'Please provide your registered email address.'
+						},
+						emailAddress: {
+	                        message: 'Please provide valid email address.'
+	                    }
+					}
+				},
+				new_password: {
+					validators: {
+						notEmpty: {
+							message: 'Please provide new password.'
+						},
+						stringLength: {
+							min: 8,
+							max: 20,
+							message: 'Passowrd must be between 8 to 20 characters.'
+						},
+					}
+				},
+				confirm_password: {
+					validators: {
+						notEmpty: {
+							message: 'Please confirm the new password.'
+						},
+						identical: {
+							compare: function () {
+								return form.querySelector('[name="new_password"]').value;
+							},
+							message: 'Confirmation password do not match with new password.'
+						}
+					}
+				},
+			},
+			plugins: {
+				trigger: new FormValidation.plugins.Trigger(),
+				bootstrap3: new FormValidation.plugins.Bootstrap3(),
+				passwordStrength: new FormValidation.plugins.PasswordStrength({
+					field: 'new_password',
+					message: 'The password is weak',
+					minimalScore: 3,
+					onValidated: function (valid, message, score) {
+						switch (score) {
+							case 0:
+								passwordMeter.style.width = randomNumber(1, 20) + '%';
+								passwordMeter.style.backgroundColor = '#ff4136';
+							case 1:
+								passwordMeter.style.width = randomNumber(20, 40) + '%';
+								passwordMeter.style.backgroundColor = '#ff4136';
+								break;
+							case 2:
+								passwordMeter.style.width = randomNumber(40, 60) + '%';
+								passwordMeter.style.backgroundColor = '#ff4136';
+								break;
+							case 3:
+								passwordMeter.style.width = randomNumber(60, 80) + '%';
+								passwordMeter.style.backgroundColor = '#ffb700';
+								break;
+							case 4:
+								passwordMeter.style.width = '100%';
+								passwordMeter.style.backgroundColor = '#19a974';
+								break;
+							default:
+								break;
+						}
+					},
+				}),
+				submitButton: new FormValidation.plugins.SubmitButton(),
+				defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+			},
+		});
+	});
+</script>

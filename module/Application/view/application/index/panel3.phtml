@@ -1,0 +1,429 @@
+<?php
+/**
+ * View -- of Application/IndexController/panel3Action
+ * chophel@athang.com
+ */
+	$this->headTitle($title);
+?>
+<div class="container-xl">
+	<!-- Page title -->
+	<div class="page-header d-print-none">
+		<div class="row align-items-center">
+			<div class="col">
+				<!-- Page pre-title -->
+                <div class="page-pretitle">Overview</div>
+                <h2 class="page-title">Dashboard</h2>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="page-body">
+	<div class="container-xl">
+		<div class="row row-deck row-cards">
+			<div class="col-lg-6">
+                <div class="card">
+                  	<div class="card-body">
+                    	<h3 class="card-title">Geo Reference of Project Implemnetation</h3>
+						<div id="map" class="leaflet-map"></div>
+						<?php $districts = $this->districtObj->getAll();
+							$locations = $this->locationObj->get(array('l.status'=>'1'));
+							$activities = $this->implementationObj->get(array('status'=>'8'));
+							echo $this->leaflet('map', $districts, $locations, $activities, $this->basePath(), '1');?>
+					</div>
+                </div>
+			</div>
+			<div class="col-lg-6">
+                <div class="card">
+                  	<div class="card-body">
+					  	<h3 class="card-title">Budget Utilization of PIU: <?php echo $this->locationObj->getColumn($login_location,'location');?></h3>
+						<div id="chart7" class="canvas-chart"></div>
+						<?php $max_endorsed_fiscal = $this->workplanObj->getMax(array('status'=>'6'),'fiscal_year');
+						$Chart7Points = "";
+						$Total_Amount = array();
+						$login_location = 6;
+						$budget_amt1 = $this->workplanObj->getSum('total_budget_amount',array('location'=> $login_location,'fiscal_year'=>$max_endorsed_fiscal,'status'=>'6'));
+						$expense_amt1 = $this->implementationObj->getSum('expenditure',array('location'=> $login_location,'fiscal_year'=>$max_endorsed_fiscal,'status'=>'8'));
+						$contribution_cash1 = $this->implementationObj->getSum('contribution_cash',array('location'=> $login_location,'fiscal_year'=>$max_endorsed_fiscal,'status'=>'8'));
+						$contribution_kind1 = $this->implementationObj->getSum('contribution_kind',array('location'=> $login_location,'fiscal_year'=>$max_endorsed_fiscal,'status'=>'8'));
+						
+						$budget_amt1 = floatval(preg_replace('/[^\d.]/', '', $budget_amt1));
+						$expense_amt1 = floatval(preg_replace('/[^\d.]/', '', $expense_amt1));
+						$contribution_cash1 = floatval(preg_replace('/[^\d.]/', '', $contribution_cash1));
+						$contribution_kind1 = floatval(preg_replace('/[^\d.]/', '', $contribution_kind1));
+						
+						$Total_Amount = array(
+							array("y"=>$budget_amt1,"label"=>"Work Plan Budget"),	
+							array("y"=>$expense_amt1,"label"=>"Implementation Expenditure"),	
+							array("y"=>$contribution_cash1,"label"=>"Beneficiary Contribution (Cash)"),	
+							array("y"=>$contribution_kind1,"label"=>"Beneficiary Contribution (Kind)"),	
+						);
+						$Chart7Points = "{type: 'column', toolTipContent: '{label}: {y} (Nu.)', indexLabel: '{y}', dataPoints: ".json_encode($Total_Amount,JSON_NUMERIC_CHECK)."}";
+						
+						$axisY = "Total Amount (Nu.)"; 
+						echo $this->canvas('chart7',$Chart7Points,'',$axisY);?>
+					</div>
+                </div>
+			</div>
+			<div class="col-lg-6">
+                <div class="card">
+                  	<div class="card-body">
+                    	<h3 class="card-title">Budgeting/Expenditure/Contribution</h3>
+						<div id="chart6" class="canvas-chart"></div>
+						<?php $max_endorsed_fiscal = $this->workplanObj->getMax(array('status'=>'6'),'fiscal_year');
+						$Chart6Points = "";
+						$Budget = array();
+						$Expense = array();
+						$ContributionCash = array();
+						$ContributionKind = array();
+						foreach($this->locationObj->get(array('l.status'=>'1')) as $location):
+							$budget_amt = $this->workplanObj->getSum('total_budget_amount',array('location'=> $location['id'],'fiscal_year'=>$max_endorsed_fiscal,'status'=>'6'));
+							$expense_amt = $this->implementationObj->getSum('expenditure',array('location'=> $location['id'],'fiscal_year'=>$max_endorsed_fiscal,'status'=>'8'));
+							$contribution_cash = $this->implementationObj->getSum('contribution_cash',array('location'=> $location['id'],'fiscal_year'=>$max_endorsed_fiscal,'status'=>'8'));
+							$contribution_kind = $this->implementationObj->getSum('contribution_kind',array('location'=> $location['id'],'fiscal_year'=>$max_endorsed_fiscal,'status'=>'8'));
+							
+							$budget_amt = floatval(preg_replace('/[^\d.]/', '', $budget_amt));
+							$expense_amt = floatval(preg_replace('/[^\d.]/', '', $expense_amt));
+							$contribution_cash = floatval(preg_replace('/[^\d.]/', '', $contribution_cash));
+							$contribution_kind = floatval(preg_replace('/[^\d.]/', '', $contribution_kind));
+							
+							array_push($Budget,array("y"=>$budget_amt,"label"=>$location['location']));
+							array_push($Expense,array("y"=>$expense_amt,"label"=>$location['location']));
+							array_push($ContributionCash,array("y"=>$contribution_cash,"label"=>$location['location']));
+							array_push($ContributionKind,array("y"=>$contribution_kind,"label"=>$location['location']));
+						endforeach;
+						$data1 = "{type: 'area', showInLegend: true, name:'Budget', toolTipContent: '{label}: {name} = {y} (Nu.)', indexLabel: '{y}', dataPoints: ".json_encode($Budget,JSON_NUMERIC_CHECK)."}";
+						$data2 = "{type: 'line', showInLegend: true, name:'Expenditure', toolTipContent: '{label}: {name} = {y} (Nu.)', indexLabel: '{y}', dataPoints: ".json_encode($Expense,JSON_NUMERIC_CHECK)."}";
+						$data3 = "{type: 'line', showInLegend: true, name:'Contribution in Cash', toolTipContent: '{label}: {name} = {y} (Nu.)', indexLabel: '{y}', dataPoints: ".json_encode($ContributionCash,JSON_NUMERIC_CHECK)."}";
+						$data4 = "{type: 'line', showInLegend: true, name:'Contribution in Kind', toolTipContent: '{label}: {name} = {y} (Nu.)', indexLabel: '{y}', dataPoints: ".json_encode($ContributionKind,JSON_NUMERIC_CHECK)."}";
+							
+						$Chart6Points .= $data1.",".$data2.",".$data3.",".$data4.",";
+						$axisY = "(Nu.)"; 
+						echo $this->canvas('chart6',$Chart6Points,'',$axisY);?>
+					</div>
+                </div>
+			</div>
+			<div class="col-lg-6">
+                <div class="card">
+                  	<div class="card-body">
+                    	<h3 class="card-title">No. of Beneficiaries in each Dzongkhag</h3>
+						<div id="chart1" class="canvas-chart"></div>
+						<?php $districts = $this->districtObj->get(array('status'=>'1'));
+						$Total_Beneficiary_in_each_district = array();
+						$Total_Female_Beneficiary_in_each_district = array();
+						foreach($districts as $district):
+							$total_beneficiary = $this->beneficiaryObj->getCountDistinct('house_hold_no', array('district'=>$district['id']));
+							$total_female_beneficiary = $this->beneficiaryObj->getCountDistinct('house_hold_no', array('district'=>$district['id'],'gender'=>'F'));
+							array_push($Total_Beneficiary_in_each_district, array("y"=>$total_beneficiary,"label"=>$district['DzongkhagNameEn']));
+							array_push($Total_Female_Beneficiary_in_each_district, array("y"=>$total_female_beneficiary,"label"=>$district['DzongkhagNameEn']));
+						endforeach;?>
+					</div>
+                </div>
+			</div>
+			<div class="col-lg-6">
+                <div class="card">
+                  	<div class="card-body">
+                    	<h3 class="card-title">No. of Farmer Groups in each Dzongkhag</h3>
+						<div id="chart2" class="canvas-chart"></div>
+						<?php 
+						$Production_in_each_district = array();
+						$Marketing_in_each_district = array();
+						$Processing_in_each_district = array();
+						$School_Linkages_in_each_district = array();
+						foreach($districts as $district):
+							$total_production = $this->farmergroupObj->getCountDistinct('id', array('district'=>$district['id'],'type_of_group'=>'1'));
+							$total_marketing = $this->farmergroupObj->getCountDistinct('id', array('district'=>$district['id'],'type_of_group'=>'2'));
+							$total_processing = $this->farmergroupObj->getCountDistinct('id', array('district'=>$district['id'],'type_of_group'=>'3'));
+							array_push($Production_in_each_district, array("y"=>$total_production,"label"=>$district['DzongkhagNameEn']));
+							array_push($Marketing_in_each_district, array("y"=>$total_marketing,"label"=>$district['DzongkhagNameEn']));
+							array_push($Processing_in_each_district, array("y"=>$total_processing,"label"=>$district['DzongkhagNameEn']));
+							$distinct_farmer_group = $this->farmergroupObj->getDistinct('id', array('district'=>$district['id']));
+							$count_school_linkages = $this->schoollinkObj->getCount(array('farmer_group'=>$distinct_farmer_group));
+							array_push($School_Linkages_in_each_district, array("y"=>$count_school_linkages,"label"=>$district['DzongkhagNameEn']));
+						endforeach;?>
+					</div>
+                </div>
+			</div>
+			<div class="col-lg-6">
+                <div class="card">
+                  	<div class="card-body">
+                    	<h3 class="card-title">Composition of Aide Mémoire (Agreed Action Status)</h3>
+						<div id="chart3" class="canvas-chart"></div>
+						<?php 
+						$Agreedaction_in_each_status = array();
+						foreach($this->statusObj->get(array('9','10','11','12','13','14')) as $status):
+							$count_agreed_action_in_status = $this->agreedactionObj->getCount(array('status'=>$status['id']));
+							array_push($Agreedaction_in_each_status, array("y"=>$count_agreed_action_in_status,"legendText" => $status['status'],"label"=>$status['status']));
+						endforeach;?>
+					</div>
+                </div>
+			</div>
+			<div class="col-lg-12">
+                <div class="card">
+                  	<div class="card-body">
+					  	<h3 class='card-title'>Result Framework Matrix: IRI</h3>
+						<div id="chart4" class="canvas-chart"></div>
+						<?php 
+						$dataPoints = "";
+						$size_of_resultframework = 1;
+						$resultperiods = $this->resultperiodObj->get(array('status'=>'8'));
+						foreach($resultperiods as $resultperiod):
+							$Indicator_progress = array();
+							foreach($this->indicatorObj->get(array('parent_kpi'=>'0','uom'=>array(1,3,8,9))) as $indicator):
+								$progress = $this->frameworkObj->getColumn(array('indicator'=>$indicator['id'],'result_period'=>$resultperiod['id']),'cumulative_achieved');
+								$progress_percentage = ($progress)?round($progress / 100, 2):'0';
+								array_push($Indicator_progress, array("y"=> $progress_percentage, "label" => $indicator['tabindex'].".".substr($indicator['kpi'], 0, 30).".."));
+							endforeach;
+							if(sizeof($resultperiods)>$size_of_resultframework):
+								$data = "{type: 'stackedBar', showInLegend: true, name:'".$resultperiod['fiscal_year']."', axisYType: 'secondary', toolTipContent: '{label}: {name} = {y}%', dataPoints: ".json_encode($Indicator_progress,JSON_NUMERIC_CHECK)."}";
+							else:
+								$data = "{type: 'stackedBar', showInLegend: true, name:'".$resultperiod['fiscal_year']."', axisYType: 'secondary', toolTipContent: '{label}: {name} = {y}%', indexLabel: '#total%', indexLabelPlacement: 'outside', dataPoints: ".json_encode($Indicator_progress,JSON_NUMERIC_CHECK)."}";
+							endif;
+							$dataPoints .= $data.",";
+							$size_of_resultframework++;
+						endforeach;
+						?>
+					</div>
+                </div>
+			</div>
+			<div class="col-lg-6">
+                <div class="card">
+                  	<div class="card-body">
+                    	<h3 class="card-title">Active Users in each PIU</h3>
+						<div id="chart5" class="canvas-chart"></div>
+						<?php
+							$Total_Active_Users = array();
+							$Total_Logins = array();
+							foreach($this->locationObj->get(array('l.status'=>'1')) as $location):
+								$users_in_location = $this->userObj->getCount(array('location'=> $location['id'],'status'=>'1'));
+								$user_logins_in_location = $this->userObj->getSum('logins',array('location'=> $location['id'],'status'=>'1'));
+								$user_logins_in_location = round($user_logins_in_location/1000,2);
+								array_push($Total_Active_Users,array("y"=>$users_in_location,"label"=>$location['location']));
+								array_push($Total_Logins,array("y"=>$user_logins_in_location,"label"=>$location['location']));
+							endforeach;
+						?>
+					</div>
+                </div>
+			</div>
+			<div class="col-lg-6">
+                <div class="card">
+                  	<div class="card-body">
+						<?php
+							$total_space = disk_total_space(".");
+							$free_space = disk_free_space(".");
+							$si_prefix = array( 'B', 'KB', 'MB', 'GB', 'TB', 'EB', 'ZB', 'YB' );
+							$base = 1024;
+							$total_space_class = min((int)log($total_space , $base) , count($si_prefix) - 1);
+							$total_space = sprintf('%1.2f' , $total_space / pow($base,$total_space_class));
+							$free_space = sprintf('%1.2f' , $free_space / pow($base,$total_space_class));
+							$used_space = $total_space - $free_space;
+							$free_space_percent = round(($free_space*100)/$total_space,2);
+							$used_space_percent = round(($used_space*100)/$total_space,2);
+							$storage_uom = $si_prefix[$total_space_class];
+						?>
+						<p class="mb-3">Using Storage <strong><?php echo $used_space." ".$storage_uom;?></strong>of <?php echo $total_space." ".$storage_uom;?></p>
+                        <div class="progress progress-separated mb-3">
+							<div class="progress-bar bg-primary" role="progressbar" style="width: <?php echo $used_space_percent;?>%"></div>
+                          	<div class="progress-bar bg-success" role="progressbar" style="width: <?php echo $free_space_percent;?>%"></div>
+                        </div>
+                        <div class="row">
+							<div class="col-auto d-flex align-items-center pe-2">
+								<span class="legend me-2 bg-info"></span>
+								<span>Total Space: <?php echo $total_space." ".$storage_uom;?></span>
+                          	</div>
+                          	<div class="col-auto d-flex align-items-center pe-2">
+								<span class="legend me-2 bg-primary"></span>
+								<span>Used Space: <?php echo $used_space." ".$storage_uom;?></span>
+                          	</div>
+							<div class="col-auto d-flex align-items-center px-2">
+								<span class="legend me-2 bg-success"></span>
+								<span>Free Space: <?php echo $free_space." ".$storage_uom;?></span>
+							</div>
+                        </div>
+						<div class="mt-3">
+						<table class="table card-table table-vcenter table-bordered">
+							<thead>
+								<tr>
+									<th style="width:25%">Server Name</th>
+									<td><?php echo $_SERVER['SERVER_NAME'];?></td>
+								</tr>
+								<tr>
+									<th style="width:25%">HTTP Host</th>
+									<td><?php echo $_SERVER['HTTP_HOST'];?></td>
+								</tr>
+								<tr>
+									<th style="width:25%">User Agent</th>
+									<td><?php echo $_SERVER['HTTP_USER_AGENT'];?></td>
+								</tr>
+								<tr>
+									<th style="width:25%">Remote Client Address</th>
+									<td><?php echo $_SERVER['REMOTE_ADDR'];?></td>
+								</tr>
+							</thead>
+						</table>	
+						</div>
+					</div>
+                </div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+    $(function () {
+		var chart5 = new CanvasJS.Chart("chart5", {
+            animationEnabled: true,
+			exportFileName: "Active Users in each PIU",
+            exportEnabled: true,
+            legend: {
+                verticalAlign: "center",
+                horizontalAlign: "right",
+            },
+            theme: "light2",
+            data: [
+				{
+					type: "line",
+					name: "Active Users",
+					showInLegend: true,
+					dataPoints: <?php echo json_encode($Total_Active_Users, JSON_NUMERIC_CHECK); ?>
+				},{
+					type: "line",
+					name: "Login Traffic (Thousand)",
+					showInLegend: true,
+					dataPoints: <?php echo json_encode($Total_Logins, JSON_NUMERIC_CHECK); ?>
+				},
+            ]
+        });
+        chart5.render();
+
+		var chart4 = new CanvasJS.Chart("chart4", {
+			theme: "light1",
+			zoomEnabled: true,
+			zoomType: "y",
+			exportFileName: "Project Implemnetation: Result Framework Matrix",
+            exportEnabled: true,
+			animationEnabled: true,
+			legend: {
+                verticalAlign: "top",
+                horizontalAlign: "left"
+            },
+			axisX: {
+				interval: 1,
+            },
+			axisY2: {
+				suffix: "%",
+				maximum: 100,
+            },
+            data: [
+				<?php echo $dataPoints;?>
+            ]
+        });
+        chart4.render();
+
+		var chart3 = new CanvasJS.Chart("chart3", {
+            animationEnabled: true,
+			exportFileName: "Composition of Aide Mémoire",
+            exportEnabled: true,
+            legend: {
+                verticalAlign: "center",
+                horizontalAlign: "right",
+                fontSize: 11,
+                fontFamily: "Helvetica"
+            },
+            theme: "light2",
+            data: [
+            {
+                type: "pie",
+                indexLabelFontFamily: "Garamond",
+                indexLabelFontSize: 12,
+                indexLabel: "{label} {y}%",
+                startAngle: -20,
+                showInLegend: true,
+                toolTipContent: "{legendText} {y}%",
+                dataPoints: <?php echo json_encode($Agreedaction_in_each_status, JSON_NUMERIC_CHECK); ?>
+            }
+            ]
+        });
+        chart3.render();
+
+		var chart2 = new CanvasJS.Chart("chart2", {
+			theme: "light2",
+			colorSet: "sandColorSet",
+			exportFileName: "No. of Farmer Groups in each Dzongkhag",
+            exportEnabled: true,
+			animationEnabled: true,
+			legend: {
+                verticalAlign: "bottom",
+                horizontalAlign: "center"
+            },
+            axisY: {
+                title: "No. of Farmer Groups",
+            },
+            data: [
+			{
+				type: "stackedColumn",
+				toolTipContent: "{label}: {y} Production FG",
+				legendText: "Production FG",
+				showInLegend: "true",
+				indexLabelPlacement: "outside",
+				dataPoints: <?php echo json_encode($Production_in_each_district, JSON_NUMERIC_CHECK); ?>
+			}, {
+				type: "stackedColumn",
+				toolTipContent: "{label}: {y} Marketing FG",
+				legendText: "Marketing FG",
+				showInLegend: "true",
+				indexLabelPlacement: "outside",
+				dataPoints: <?php echo json_encode($Marketing_in_each_district, JSON_NUMERIC_CHECK); ?>
+			}, {
+				type: "stackedColumn",
+				toolTipContent: "{label}: {y} Processing FG",
+				legendText: "Processing FG",
+				showInLegend: "true",
+				indexLabel: "#total",
+				indexLabelPlacement: "outside",
+				dataPoints: <?php echo json_encode($Processing_in_each_district, JSON_NUMERIC_CHECK); ?>
+			}, {
+				type: "line",
+				toolTipContent: "{label}: {y} Schools Linked",
+				legendText: "No. of Schools Linked",
+				showInLegend: "true",
+				dataPoints: <?php echo json_encode($School_Linkages_in_each_district, JSON_NUMERIC_CHECK); ?>
+			}
+            ]
+        });
+        chart2.render();
+
+        var chart1 = new CanvasJS.Chart("chart1", {
+			theme: "light2",
+			colorSet:  "rusticColorSet",
+			exportFileName: "No. of Beneficiaries in each Dzongkhag",
+            exportEnabled: true,
+			animationEnabled: true,
+			legend: {
+                verticalAlign: "bottom",
+                horizontalAlign: "center"
+            },
+            axisY: {
+                title: "No. of Beneficiaries",
+            },
+            data: [
+			{
+				type: "stackedBar",
+				toolTipContent: "{label}: {y} Female Beneficiaries",
+				legendText: "Female Beneficiaries",
+				showInLegend: "true",
+				indexLabel: "{y}",
+				indexLabelPlacement: "outside",
+				dataPoints: <?php echo json_encode($Total_Female_Beneficiary_in_each_district, JSON_NUMERIC_CHECK); ?>
+			}, {
+				type: "stackedBar",
+				toolTipContent: "{label}: #total Total Beneficiaries",
+				legendText: "Total Beneficiaries",
+				showInLegend: "true",
+				indexLabel: "#total",
+				indexLabelPlacement: "outside",
+				dataPoints: <?php echo json_encode($Total_Beneficiary_in_each_district, JSON_NUMERIC_CHECK); ?>
+			}
+            ]
+        });
+        chart1.render();
+	});
+</script>

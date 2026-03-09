@@ -1,0 +1,73 @@
+<?php
+/**
+ * View -- 
+ * singye@athang.com
+ */
+$this->headTitle($this->title);
+?>
+<?php echo $this->tabs_helper(array(1003,1008)); ?>
+<div class="card">
+	<div class="card-header">
+		<?php if (!empty($expiryNotice)): ?>
+			<div class="alert alert-warning" style="margin-bottom:10px;">
+				<i class="fa fa-exclamation-triangle"></i>
+				<?php echo $this->escapeHtml($expiryNotice);  ?>
+				<div class="btn-group pull-right">
+					<?php echo $this->button(6,$subID,0,1009);?>
+				</div>
+			</div>
+		<?php endif; ?>
+		<div class="btn-group pull-right">
+			<?php echo $this->button(2,$page);?>
+		</div>
+	</div>
+	<div class="table-responsive">
+		<table class="table card-table text-nowrap" id="dataTables">
+			<thead>
+				<tr>
+					<th>#</th>
+					<th>News Channel</th>
+					<?php if($this->button(1)!=""):?>
+						<th class="no-sort no-printpdf">Action</th>
+					<?php endif;?>	
+				</tr>
+			</thead>
+			<tbody>
+			<?php $i=1+(($page-1)*20); foreach ($paginator as $row):?>
+				<tr data-href="<?php echo $this->button(4,$row['id']); ?>">
+					<td><?php  echo $i++; ?></td>								       
+					<td class="fw-bold">
+					    <span style="color:#666;font-size:95%;"><?php echo $row['new_updated'];?></span>	
+						<span class="label label-info" style="border-radius: 12px; padding: 2px 8px; display:inline-block;"><?php echo $this->newstypeObj->getColumn($row['news_type'],'name');?></span>
+					</td>
+					<?php if($this->button(1)!=""): ?>
+						<td class="action">
+							<?php echo $this->button(1,$row['id']);?>
+						</td>
+					<?php endif; ?>
+				</tr>
+			<?php endforeach; ?>
+			</tbody>
+		</table>
+	</div>
+	<div class="card-footer d-flex align-items-center">
+		<?php echo $this->paginationControl($paginator,'Sliding','news_pagination.phtml', 
+			array('route' => 'news/paginator','action'=>'news','id'=>'0'));?>
+	</div>
+</div>
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<script>
+	$("tr[data-href]").each(function(){
+		$(this).find('td').not('td.action').each(function(){
+			$(this).css('cursor','pointer');
+			$(this).bind('click',function() {
+				window.document.location = $(this).closest('tr').attr("data-href");
+			});
+		});
+	});
+</script>

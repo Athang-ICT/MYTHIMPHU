@@ -1,0 +1,167 @@
+<?php
+/**
+ * View -- of Sales/SaleController/indexAction
+ */
+	$this->headTitle($this->title);	
+	//foreach($weekends as $weekend):print_r($weekend);endforeach;exit;
+?>
+<style>
+    .weekend {
+        background-color: #c08081;
+    }
+	 .absent {
+        background-color: red;
+    }
+	 .present {
+        background-color: #3F9B0B;;
+    }
+	 .late {
+        background-color: #FFD801;;
+    }
+	.days {
+        background-color: white;;
+    }
+	
+	
+</style>
+<?php echo $this->partial('administration/user/partial.phtml', array('active' => 'monthly')); ?>
+<div class="card">
+	<div class="card-header">
+		<div class="row">
+		<?php $currentYear = (int)date('Y');
+		$currentMonth = (int)date('m');
+		$currentdate = (int)date('d');
+                $minYear = ($this->minYear == 0)? date('Y'):$this->minYear;?>
+			<form id="#form" method="post" action="<?php echo $this->url('user',array('action'=>'monthly')); ?>"  enctype="multipart/form-data" >
+					<div class="form-group col-lg-2">
+					<label class="control-label" for="year">Year</label>
+					<select name="year" id="year" class="form-control" onchange='this.form.submit()'>
+						<option value="-1">All</option>
+						<?php for($year = $currentYear; $year >= $minYear; $year--):
+							$selected = ($data['year'] == $year)?'selected':''; ?>
+							<option value="<?php echo $year;?>" <?php echo $selected;?>> <?php echo $year; ?> </option>
+						<?php endfor;?>
+					</select>
+				</div>
+				<div class="col-lg-2">
+					<label for="month" class="control-label">Month </label>
+					<select class="form-control" name="month" id="month" data-placeholder="Select" onchange='this.form.submit()' >
+						<option value=""></option>
+						<?php 
+							for($m=1;$m<=12;$m++):
+								$selected = ($data['month'] == $m)?'selected':'';
+						?>
+							<option value="<?php echo $m;?>" <?php echo $selected;?>>
+								<?php echo date("F", strtotime(date("d-$m-y"))); ?>
+							</option>
+						<?php endfor; ?>
+					</select>
+				</div>
+				<div class="form-group col-lg-2">
+					<label class="control-label" for="region">Region/Division</label>
+					<select class="form-control" id="region" name="region" data-placeholder="Select" onchange='this.form.submit()'>
+						<option value="-1" <?php echo ($data['region'] == '-1')?'selected':'';?>>All</option>
+						<?php foreach($region as $act):?>
+							<option value="<?php echo $act['id'];?>" <?php echo ($act['id']==$data['region'])?'selected':''; ?>>
+								<?php echo $act['region'];?>
+							</option> 
+						<?php endforeach;?>
+					</select>
+				</div>
+				<div class="form-group col-lg-2">
+					<label class="control-label" for="location">Location</label>
+					<select class="form-control" id="location" name="location" data-placeholder="Select" onchange='this.form.submit()'>
+						<option value="-1" <?php echo ($data['location'] == '-1')?'selected':'';?>>All</option>
+						<?php foreach($location as $loc):?>
+							<option value="<?php echo $loc['id'];?>" <?php echo ($loc['id']==$data['location'])?'selected':''; ?>>
+								<?php echo $loc['location'];?>
+							</option> 
+						<?php endforeach;?>
+					</select>
+				</div>
+				<div class="col-lg-2">
+					<div class="clearfix">
+						<div class="pull-right tableTools-container"></div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div class="card-body">
+		<div style="overflow: auto;">
+			<table class="table table-bordered table-striped table-hover" id="dataTables">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Region/Division</th>
+						<th>Location</th>
+						<th>Name</th>
+						<?php for($i=1;$i<=$last_day;$i++):?>
+						<th><?php echo $i;?></th>
+						<?php endfor;?>
+					</tr>
+				</thead>
+				<tbody>
+				<?php $j=1; foreach($employee as $emp):
+				//echo'<pre>';print_r($emp);
+				if($emp['id']!=1):
+				?>
+				
+					<tr data-href="<?php echo $this->url('user', array('action'=>'monthly'));?>" >
+						<td><?php echo $j++; ?></td>
+						<td><?php echo $this->regionObj->getColumn($emp['region_id'],'region');?></td>
+						<td><?php echo $this->locationObj->getColumn($emp['location_id'],'location');?></td>
+						<td><?php echo $emp['full_name']; ?></td>
+						<?php for($i=1;$i<=$last_day;$i++):?>
+							<?php $days=0;$entry="";foreach($weekends as $weekend):
+								if($weekend==$i){
+									$days=1;
+									break;
+								}
+								else{$days=0;
+								$att=$this->attendance->getAttbyDay(array('e.id'=>$emp['id']),$data['year'],$data['month'],$i);
+								foreach($att as $atts);
+									if(sizeof($att)!=null){$entry = $this->attendance->getColumn(array('date' => date("{$data['year']}-{$data['month']}-$i"), 'user' => $atts['user_id']), 'entry');
+									}
+								}
+								endforeach;?>
+								
+							<td <?php if($days==1):?> class="weekend" <?php elseif($days==0 && $data['month']==$currentMonth && $i>$currentdate):?> class="days"
+								<?php elseif($days==0 && sizeof($att)==null):?>class="absent"
+							<?php elseif($days==0 && sizeof($att)!=null && $entry>"09:15:00"):;?>class="late" <?php else:;?> class="present"
+							<?php endif;?>>
+							<b><?php if($days==1){echo "WE";}else{echo "";}?></b></td>
+						<?php endfor;?>
+					</tr>
+					<?php endif;endforeach; ?>
+				</tbody>	
+			</table>
+		</div>
+	</div>
+</div>
+<div id="modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content"> </div>
+	</div>
+</div>
+<script>	
+$('document').ready(function(){
+	$('#att_date').datepicker();
+	$('#dataTables').DataTable({
+		"paging":   true,
+	});
+	$('#region').on('change',function(){
+		$.post(
+				"<?php echo $this->url('user', array('action' => 'getlocationviaregion'));?>",
+				{
+					region: $(this).val(),
+				},
+				function(data){
+					$('#location').html(data.location);
+					$('#location').trigger('chosen:updated');
+				},
+				'json'
+			);
+	});
+});
+</script>

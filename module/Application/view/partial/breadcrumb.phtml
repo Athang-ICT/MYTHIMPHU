@@ -1,0 +1,37 @@
+<?php
+/**
+ * Partial -- breadcrumb
+ * chophel@athang.com
+ */
+?>
+<div class="breadcrumbs ace-save-state breadcrumbs-fixed" id="breadcrumbs">
+	<ul class="breadcrumb">
+		<li>
+			<i class="ace-icon fa fa-home home-icon"></i>
+			<a href="<?php echo $this->url('application');?>">Home</a>
+		</li>
+		<?php 
+		$i =1; $breadcrumb = $this->breadcrumb();
+		foreach($breadcrumb as $bc_route):
+			extract($bc_route);
+			if(strlen($tabindex) > 2):
+				$url =$this->url($route, array('action'=>$action));
+			else:
+				$url = $this->url($route);
+			endif;
+			if($i++ == sizeof($breadcrumb)):?>		
+				<li class="active"><?php echo $menu;?></li>
+		<?php else:?>
+			<li ><a href="<?php echo $url;?>"> <?php echo $menu;?></a></li>
+		<?php endif; endforeach;?>		
+	</ul><!-- /.breadcrumb -->
+
+	<div class="nav-search" id="nav-search">
+		<form class="form-search">
+			<span class="input-icon">
+				<input type="text" placeholder="Search ..." class="nav-search-input" id="nav-search-input" autocomplete="off" />
+				<i class="ace-icon fa fa-search nav-search-icon"></i>
+			</span>
+		</form>
+	</div><!-- /.nav-search -->
+</div>

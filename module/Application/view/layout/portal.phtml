@@ -1,0 +1,412 @@
+<?php
+/**
+ * Public (Anonymous) Layout for Portal
+ */
+?>
+<?= $this->doctype() ?>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <?= $this->headTitle('mythimphu')->setSeparator(' - ')->setAutoEscape(false) ?>
+
+        <?= $this->headMeta()
+            ->appendName('viewport', 'width=device-width, initial-scale=1.0, viewport-fit=cover')
+            ->appendHttpEquiv('X-UA-Compatible', 'IE=edge')
+        ?>
+
+        <?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/images/favicon.png'))
+            ->prependStylesheet($this->basePath() . '/css/athang.css')
+            ->prependStylesheet($this->basePath() . '/css/select2.min.css')
+            ->prependStylesheet($this->basePath() . '/css/toastr.min.css')
+            ->prependStylesheet($this->basePath() . '/css/formValidation.min.css')
+            ->prependStylesheet($this->basePath() . '/css/fonts.googleapis.com.css')
+            ->prependStylesheet($this->basePath() . '/font-awesome/css/font-awesome.min.css')
+            ->prependStylesheet($this->basePath() . '/css/monal.min.css')
+            ->prependStylesheet($this->basePath() . '/dataTables/datatables.min.css')
+            ->prependStylesheet($this->basePath() . '/css/bootstrap-datepicker3.min.css')
+            ->prependStylesheet($this->basePath() . '/css/bootstrap.min.css');
+        ?> 
+
+        <?php echo $this->headScript()
+            ->prependFile($this->basePath() . '/js/athang.js')
+            ->prependFile($this->basePath() . '/js/select2.min.js')
+            ->prependFile($this->basePath() . '/js/toastr.min.js')
+            ->prependFile($this->basePath() . '/js/FormValidationBootstrap3.min.js')
+            ->prependFile($this->basePath() . '/js/FormValidation.min.js')
+            ->prependFile($this->basePath() . '/js/monal-elements.min.js')
+            ->prependFile($this->basePath() . '/js/monal.min.js')
+            ->prependFile($this->basePath() . '/js/monal-extra.min.js')
+            ->prependFile($this->basePath() . '/dataTables/datatables.min.js')
+            ->prependFile($this->basePath() . '/js/bootstrap-datepicker.min.js')
+            ->prependFile($this->basePath() . '/js/bootstrap.min.js')
+            ->prependFile($this->basePath() . '/js/print.js')
+            ->prependFile($this->basePath() . '/js/jquery-2.2.4.min.js');
+        ?>
+        <style>
+            body.public-layout { 
+                background-color: transparent; 
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                padding-top: 0;
+            }
+            
+            .public-wrapper { 
+                max-width: 100%; 
+                margin: 0; 
+                padding: 0;
+            }
+
+            /* Professional Portal Styling */
+            .portal-navbar {
+                background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+                border: none;
+                position: fixed;
+                top: 0;
+                width: 100%;
+                z-index: 1030;
+                padding: 12px 0;
+            }
+
+            .portal-navbar .navbar-brand {
+                font-size: 20px;
+                font-weight: 600;
+                color: #fff !important;
+                letter-spacing: 0.5px;
+            }
+
+            .portal-navbar .navbar-brand i {
+                margin-right: 8px;
+                font-size: 22px;
+            }
+
+            .portal-navbar .nav > li > a {
+                color: #ecf0f1 !important;
+                font-size: 14px;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                padding: 8px 15px;
+            }
+
+            .portal-navbar .nav > li > a:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+                color: #fff !important;
+                border-radius: 3px;
+            }
+
+            .portal-navbar .dropdown-menu {
+                background-color: #34495e;
+                border: none;
+                border-radius: 4px;
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            }
+
+            .portal-navbar .dropdown-menu > li > a {
+                color: #ecf0f1;
+            }
+
+            .portal-navbar .dropdown-menu > li > a:hover {
+                background-color: rgba(255, 255, 255, 0.15);
+                color: #fff;
+            }
+
+            /* Search Bar Section */
+            .portal-search-section {
+                background-color: transparent;
+                padding: 25px 0;
+                margin: 80px 0 30px 0;
+                box-shadow: none;
+            }
+
+            .search-container {
+                max-width: 900px;
+                margin: 0 auto;
+                padding: 0 15px;
+            }
+
+            .search-input-group {
+                position: relative;
+            }
+
+            .search-input-group .input-group {
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .search-input-group .input-group-addon {
+                background-color: #3498db;
+                border: none;
+                color: white;
+                font-size: 14px;
+            }
+
+            .search-input-group .form-control {
+                border: none;
+                padding: 12px 15px;
+                font-size: 14px;
+                border-radius: 0 4px 4px 0;
+            }
+
+            .search-input-group .form-control:focus {
+                box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 8px rgba(52, 152, 219, 0.5);
+                border-color: #3498db;
+            }
+
+            .results-info {
+                text-align: right;
+                margin-top: 12px;
+                font-size: 13px;
+                color: #7f8c8d;
+            }
+
+            .results-count {
+                display: inline-block;
+                background-color: #3498db;
+                color: white;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-weight: 500;
+            }
+
+            /* Services Grid */
+            .portal-services {
+                padding: 0 15px;
+                margin-bottom: 40px;
+                margin-left: auto;
+                margin-right: auto;
+                max-width: 100%;
+            }
+
+            .section-title {
+                font-size: 22px;
+                font-weight: 600;
+                color: #2c3e50;
+                margin: 25px 0 20px 0;
+                padding-bottom: 10px;
+                border-bottom: 3px solid #3498db;
+            }
+
+            .section-title i {
+                color: #f39c12;
+                margin-right: 8px;
+            }
+
+            /* Latest News Section */
+            .latest-news-section {
+                margin-bottom: 35px;
+                padding: 20px;
+                background-color: transparent;
+                border-radius: 8px;
+            }
+
+            .latest-news-card {
+                background-color: #fff;
+                border: 2px solid #3498db;
+                border-radius: 6px;
+                padding: 15px;
+                margin-bottom: 18px;
+                transition: all 0.3s ease;
+                box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .latest-news-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+                border-color: #2980b9;
+            }
+
+            .latest-badge {
+                display: inline-block;
+                background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+                color: white;
+                padding: 4px 10px;
+                border-radius: 15px;
+                font-size: 10px;
+                font-weight: 600;
+                margin-bottom: 10px;
+                text-transform: uppercase;
+                align-self: flex-start;
+            }
+
+            .latest-title {
+                font-size: 14px;
+                font-weight: 700;
+                color: #2c3e50;
+                margin: 8px 0;
+                line-height: 1.3;
+            }
+
+            .latest-desc {
+                color: #7f8c8d;
+                font-size: 11px;
+                line-height: 1.5;
+                margin-bottom: 12px;
+                flex-grow: 1;
+            }
+
+            .latest-btn {
+                background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+                color: white;
+                border: none;
+                padding: 6px 10px;
+                font-size: 11px;
+                font-weight: 600;
+                border-radius: 3px;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+                text-align: center;
+            }
+
+            .latest-btn:hover {
+                background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+                color: white;
+                text-decoration: none;
+            }
+
+            .latest-btn i {
+                margin-right: 4px;
+            }
+
+            .service-card {
+                background-color: #fff;
+                border: none;
+                border-radius: 5px;
+                margin-bottom: 18px;
+                transition: all 0.3s ease;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+            }
+
+            .service-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+            }
+
+            .service-card-header {
+                background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+                color: white;
+                padding: 10px 12px;
+                font-size: 13px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+            }
+
+            .service-card-header i {
+                margin-right: 6px;
+                font-size: 13px;
+            }
+
+            .service-card-body {
+                padding: 12px;
+                flex-grow: 1;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .service-description {
+                color: #555;
+                font-size: 12px;
+                line-height: 1.5;
+                margin-bottom: 10px;
+                flex-grow: 1;
+            }
+
+            .service-footer {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding-top: 8px;
+                border-top: 1px solid #ecf0f1;
+            }
+
+            .service-badge {
+                display: inline-block;
+                background-color: #f0f2f5;
+                color: #555;
+                padding: 3px 8px;
+                border-radius: 3px;
+                font-size: 10px;
+                font-weight: 500;
+            }
+
+            .service-badge i {
+                margin-right: 3px;
+                color: #27ae60;
+            }
+
+            .service-btn {
+                background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+                color: white;
+                border: none;
+                padding: 6px 10px;
+                font-size: 11px;
+                font-weight: 600;
+                border-radius: 3px;
+                transition: all 0.3s ease;
+                cursor: pointer;
+                text-decoration: none;
+                display: inline-block;
+            }
+
+            .service-btn:hover {
+                background: linear-gradient(135deg, #229954 0%, #1e8449 100%);
+                color: white;
+                text-decoration: none;
+                transform: scale(1.05);
+            }
+
+            /* No Results Message */
+            #no-results {
+                text-align: center;
+                padding: 40px 20px;
+                background-color: #fff;
+                border-radius: 6px;
+                border-left: 4px solid #3498db;
+                color: #555;
+                font-size: 14px;
+            }
+
+            #no-results i {
+                margin-right: 8px;
+                font-size: 18px;
+            }
+
+            /* Responsive adjustments */
+            @media (max-width: 768px) {
+                .portal-navbar {
+                    padding: 10px 0;
+                }
+
+                .portal-navbar .navbar-brand {
+                    font-size: 18px;
+                }
+
+                .service-card-header {
+                    font-size: 14px;
+                    padding: 14px;
+                }
+
+                .search-container {
+                    padding: 0 15px;
+                }
+
+                .portal-search-section {
+                    margin-top: 70px;
+                }
+            }
+        </style>
+    </head>
+    <body class="public-layout">
+        <div class="public-wrapper">
+            <?= $this->content ?>
+            <?= $this->flashmessage() ?>
+        </div>
+    </body>
+</html>

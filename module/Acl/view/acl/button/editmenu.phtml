@@ -1,0 +1,163 @@
+<?php 
+/**
+ * View -- of Acl/ButtonController/editmenu
+ * chophel@athang.com -- 2022
+ */
+$this->headTitle($this->title);
+?>
+<?php foreach($acl as $row);?>
+<form id="#form" method="post" action="<?php echo $this->url('button', array('action' => 'editmenu','id'=>$page)); ?>"  enctype="multipart/form-data" >                  
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title"><i class="ace-icon fa fa-pencil-square-o"></i><?php echo $this->title.": ".$row['menu']; ?></h4>
+    </div>  <!-- /modal-header -->
+    <div class="modal-body">
+		<div class="panel panel-default">
+			<div class="panel-body">   
+				<div class="row">
+					<input type="hidden" id="acl_id" name="acl_id" value="<?php echo $row['id'];?>" />
+					<input type="hidden" id="resource" name="resource" value="<?php echo $row['resource'];?>" />
+					<input type="hidden" id="btn" name="btn" value="<?php echo $row['btn'];?>" />
+					<div class="form-group col-lg-4"> 
+						<label class="control-label" for="menu">Menu</label>
+						<input type="text" class="form-control" value="<?php echo $row['menu'];?>" name="menu" id="menu" required /> 			
+					</div>
+					<div class="form-group col-lg-4">  
+						<label class="control-label" for="description">Description</label>
+						<input type="text" class="form-control" value="<?php echo $row['description'];?>" name="description" id="description" required /> 			
+					</div>
+					<div class="form-group col-lg-4">  
+						<label for="display" class="control-label">Menu Display</label>
+						<div class="radio">
+							<label>
+								<input class="ace" type="radio" name="display" id="display" value="1" <?php echo ($row['display']=='1')?"checked":"";?> />
+								<span class="lbl"> Yes </span>
+							</label>
+							<label>
+								<input class="ace" type="radio" name="display" id="display" value="0" <?php echo ($row['display']=='0')?"checked":"";?> />
+								<span class="lbl"> No </span>
+							</label>
+						</div>
+					</div>
+				</div>
+				<?php if($row['btn']!='1'):?>
+				<div class="row">
+					<div class="form-group mb-3 col-lg-6">
+						<label class="control-label" for="icon">Menu Icon </label>
+						<?php $icon_dtls = $this->iconObj->get(array('icon' => $row['icon']));
+							if(sizeof($icon_dtls)==1):
+								foreach($icon_dtls as $dtl);
+								$type_id = $dtl['icon_type'];
+								$group_id = $dtl['icon_group'];
+								$icon = $row['icon'];
+							else:
+								$type_id = '-1';
+								$group_id = '-1';
+								$icon = '0';
+							endif;
+						?>
+						<div class="row">
+							<div class="col-md-6">
+								<select class="form-control" name="group" id="group" data-placeholder="Group" > 
+									<option value="-1" <?php echo ($group_id=='-1')?'selected':'';?>>All</option>
+									<?php foreach($this->icongroupObj->getColumnValue('icon_type',$type_id) as $group):?>
+										<option value="<?php echo $group['id'];?>" <?php echo ($group_id==$group['id'])?'selected':'';?>>
+											<?php echo $group['icon_group'];?></option>
+									<?php endforeach;?>
+								</select>
+							</div>
+							<div class="col-md-6">
+								<select class="form-control" name="icon" id="icon" data-placeholder="Icon" > 
+									<option value="0" <?php echo ($icon=='0')?'selected':'';?>>None</option>
+									<?php foreach($this->iconObj->getColumnValue('i.icon_group',$group_id) as $icon_row):?>
+										<option value="<?php echo $icon_row['icon'];?>" <?php echo ($icon==$icon_row['icon'])?'selected':'';?>>
+											<?php echo $icon_row['icon'];?></option>
+									<?php endforeach;?>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<?php endif;?>
+			</div>
+		</div>
+	</div> <!-- /modal-body -->    
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-success"><i class="ace-icon fa fa-check"></i>Save</button>
+        <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="ace-icon fa fa-times"></i>Cancel</button> 
+    </div>
+</form>
+<script>
+$(function(){
+	$('select#group').on('change',function(){
+		$.post(
+			"<?php echo $this->url('button', array('action' => 'geticongroupchange'));?>",
+			{
+				group: $(this).val(),
+			},
+			function(data){
+				//console.log(data);
+				$('select#icon').html(data.icon);
+				$('select#icon').trigger('chosen:updated');
+			},
+			'json'
+		   );
+	});
+	const fv = FormValidation.formValidation(document.getElementById('#form'), {
+		fields: {
+			menu: {
+				validators: {
+					notEmpty: {
+						message: 'Please provide menu.'
+					}
+				}
+			},
+			description: {
+				validators: {
+					notEmpty: {
+						message: 'Please provide description.'
+					}
+				}
+			},
+			display: {
+				validators: {
+					notEmpty: {
+						message: 'Please choose menu display.'
+					}
+				}
+			},
+			group: {
+				validators: {
+					notEmpty: {
+						message: 'Please select icon group.'
+					}
+				}
+			},
+			icon: {
+				validators: {
+					notEmpty: {
+						message: 'Please select menu icon.'
+					}
+				}
+			},
+		},
+		plugins: {
+			trigger: new FormValidation.plugins.Trigger(),
+			bootstrap3: new FormValidation.plugins.Bootstrap3(),
+			submitButton: new FormValidation.plugins.SubmitButton(),
+			defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+		},
+	}).on('core.element.validated', function (e) {
+		if (e.valid) {
+			$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-invalid');
+			$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-valid');
+		} else {
+			$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-valid');
+			$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-invalid');
+		}
+	});
+	$('form select').chosen().change(function () {
+		fv.revalidateField($(this).attr('name'));
+	});
+});
+</script>

@@ -1,0 +1,106 @@
+<?php
+/**
+ * View -- of Application/IndexController/documentationAction
+ * chophel@athang.com
+ */
+	$this->headTitle($title);
+?>
+<div class="page-header">
+	<h1>Documentation </h1>
+</div><!-- /.page-header -->
+<div class="row">
+	<div class="col-xs-12">
+		<!-- PAGE CONTENT BEGINS -->
+		<div>
+			<div class="row search-page" id="search-page-1">
+				<div class="col-xs-12">
+					<div class="row">
+						<div class="col-xs-12 col-sm-3">
+							<div class="search-area well well-sm">
+								<div class="search-filter-header bg-primary">
+									<h5 class="smaller no-margin-bottom">
+										<i class="ace-icon fa fa-sliders light-green bigger-130"></i>&nbsp; Refine your Search
+									</h5>
+								</div>
+								<div class="space-10"></div>
+								<form>
+									<div class="row">
+										<div class="col-xs-12">
+											<div class="input-group">
+												<input type="text" class="form-control" name="keywords" placeholder="Look within results" />
+												<div class="input-group-btn">
+													<button type="button" class="btn btn-default no-border btn-sm">
+														<i class="ace-icon fa fa-search icon-on-right bigger-110"></i>
+													</button>
+												</div>
+											</div>
+										</div>
+									</div>
+								</form>
+								<div class="hr hr-dotted"></div>
+								<h4 class="blue smaller">
+									<i class="fa fa-tags"></i>
+									Content
+								</h4>
+
+								<div class="tree-container">
+									<ul id="cat-tree"></ul>
+								</div>
+								<div class="hr hr-dotted"></div>
+								<div class="space-4"></div>
+							</div>
+						</div>
+
+						<div class="col-xs-12 col-sm-9">
+							<div class="row">
+								<div class="search-area well col-xs-12">
+									<div class="pull-left">
+										<b class="text-primary">Display</b>&nbsp;
+										<div id="toggle-result-format" class="btn-group btn-overlap" data-toggle="buttons">
+											<label title="Thumbnail view" class="btn btn-lg btn-white btn-success active" data-class="btn-success" aria-pressed="true">
+												<input type="radio" value="2" autocomplete="off" />
+												<i class="icon-only ace-icon fa fa-th"></i>
+											</label>
+											<label title="List view" class="btn btn-lg btn-white btn-grey" data-class="btn-primary">
+												<input type="radio" value="1" checked="" autocomplete="off" />
+												<i class="icon-only ace-icon fa fa-list"></i>
+											</label>
+											<label title="Map view" class="btn btn-lg btn-white btn-grey" data-class="btn-warning">
+												<input type="radio" value="3" autocomplete="off" />
+												<i class="icon-only ace-icon fa fa-crosshairs"></i>
+											</label>
+										</div>
+									</div>
+
+									<div class="pull-right">
+										<b class="text-primary">Order</b>&nbsp;
+										<select>
+											<option>Relevance</option>
+											<option>Newest First</option>
+											<option>Rating</option>
+										</select>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-xs-12">
+									<div class="media search-media">
+										<div class="media-body">
+											<div>
+												<h4 class="media-heading">
+													<a href="#" class="blue">Getting started</a>
+												</h4>
+											</div>
+											<p><a href="<?php //echo $this->basePath() . '/manual/manual.pdf' ?>" target="_blank">Click Here to download user manual</a></p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- PAGE CONTENT ENDS -->
+	</div><!-- /.col -->
+</div><!-- /.row -->

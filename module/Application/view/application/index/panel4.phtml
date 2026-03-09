@@ -1,0 +1,56 @@
+<?php
+$this->headTitle($title);
+
+// Define news topics
+$newsItems = [
+    "Kuensel",
+    "The Bhutanese"
+];
+?>
+
+<div class="page-header">
+    <h1>News</h1>
+</div>
+
+<div class="news-box">
+
+    <h3>Latest News</h3>
+    <p class="news-description">
+        Stay updated with your favorite news sources. Subscribe to receive notifications.
+    </p>
+
+    <ul class="news-list">
+        <?php foreach ($newsItems as $item): ?>
+            <li>
+                <span class="bullet"></span>
+                <?= htmlspecialchars($item) ?>
+                <button class="subscribe-btn" data-item="<?= urlencode($item) ?>">
+                    Subscribe
+                </button>
+            </li>
+        <?php endforeach; ?>
+    </ul>
+
+</div>
+
+<style>
+.news-box { border:1px solid #ccc; padding:20px; border-radius:8px; background:#f9f9f9; max-width:600px; margin:20px auto; }
+.news-box h3 { margin-top:0; border-bottom:2px solid #007bff; padding-bottom:5px; }
+.news-description { margin:10px 0 20px 0; color:#555; }
+.news-list { list-style:none; padding-left:0; }
+.news-list li { position:relative; padding-left:20px; margin-bottom:10px; }
+.news-list li .bullet { position:absolute; left:0; top:6px; width:10px; height:10px; background:#007bff; border-radius:50%; }
+.subscribe-btn { background:#007bff; color:#fff; border:none; padding:5px 10px; font-size:0.9rem; border-radius:5px; cursor:pointer; transition:0.3s; margin-left:10px;}
+.subscribe-btn:hover { background:#0056b3; }
+</style>
+
+<script>
+// Redirect to subscribe page with selected topic
+document.querySelectorAll('.subscribe-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+        const topic = this.dataset.item;
+        // Redirect to the subscribe page, passing the topic
+        window.location.href = "<?= $this->url('application', ['action'=>'subscribe']) ?>?topic=" + encodeURIComponent(topic);
+    });
+});
+</script>

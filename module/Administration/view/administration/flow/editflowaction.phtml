@@ -1,0 +1,175 @@
+<?php 
+/**
+ * View -- of Administration/FlowController/editflowaction
+ * chophel@athang.com
+ */
+$this->headTitle($this->title);
+?>
+<?php foreach($flowactions as $row);?>
+<form id="#form" method="post" action="<?php echo $this->url('flow', array('action' => 'editflowaction','id'=>$page)); ?>"  enctype="multipart/form-data" >                  
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title"> <i class="ace-icon fa fa-pencil-square-o"></i> <?php echo $this->title; ?></h4>
+    </div>  <!-- /modal-header -->
+    <div class="modal-body">
+		<div class="panel panel-default">
+			<div class="panel-body">   
+				<div class="row">
+					<input type="hidden" id="flowaction_id" name="flowaction_id" value="<?php echo $row['id'];?>" />
+					<div class="form-group col-md-12"> 
+						<label class="control-label" for="action">Flow Action Name</label>
+						<input type="text" class="form-control" value="<?php echo $row['action'];?>" name="action" id="action" placeholder="Flow Action Name" required /> 
+					</div>
+				</div>
+				<div class="row">
+					<div  class="form-group col-md-4">
+						<label for="status" class="control-label">Status</label>
+						<div class="radio">
+							<label>
+								<input class="ace" type="radio" name="status" id="status" value="1" <?php echo ($row['status']=='1')?"checked":"";?> />
+								<span class="lbl"> Yes </span>
+							</label>
+							<label>
+								<input class="ace" type="radio" name="status" id="status" value="0" <?php echo ($row['status']=='0')?"checked":"";?> />
+								<span class="lbl"> No </span>
+							</label>
+						</div>
+					</div>
+					<div class="form-group col-md-8">
+						<label class="control-label" for="class">Button Display Class</label>
+						<?php $btn_array = explode(" ", $row['class']);?>
+						<select multiple="" class="form-control" name="class[]" id="class" data-placeholder="Select" >
+							<?php foreach($elements as $element):?>
+								<option value="<?php echo $element['class'];?>" <?php echo (in_array($element['class'],$btn_array))?'selected':'';?>>
+									<?php echo $element['class'];?>
+								</option>
+							<?php endforeach;?>
+						</select>
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-lg-12">
+						<label class="control-label" for="icon">Button Display Icon </label>
+						<?php $icon_dtls = $this->iconObj->get(array('icon' => $row['icon']));
+							if(sizeof($icon_dtls)==1):
+								foreach($icon_dtls as $dtl);
+								$type_id = $dtl['icon_type'];
+								$group_id = $dtl['icon_group'];
+								$icon = $row['icon'];
+							else:
+								$type_id = '-1';
+								$group_id = '-1';
+								$icon = '0';
+							endif;
+						?>
+						<div class="row">
+							<div class="col-md-6">
+								<select class="form-control" name="group" id="group" data-placeholder="Group" > 
+									<option value="-1" <?php echo ($group_id=='-1')?'selected':'';?>>All</option>
+									<?php foreach($this->icongroupObj->getColumnValue('icon_type',$type_id) as $group):?>
+										<option value="<?php echo $group['id'];?>" <?php echo ($group_id==$group['id'])?'selected':'';?>>
+											<?php echo $group['icon_group'];?></option>
+									<?php endforeach;?>
+								</select>
+							</div>
+							<div class="col-md-6">
+								<select class="form-control" name="icon" id="icon" data-placeholder="Icon" > 
+									<option value="0" <?php echo ($icon=='0')?'selected':'';?>>None</option>
+									<?php foreach($this->iconObj->getColumnValue('i.icon_group',$group_id) as $icon_row):?>
+										<option value="<?php echo $icon_row['icon'];?>" <?php echo ($icon==$icon_row['icon'])?'selected':'';?>>
+											<?php echo $icon_row['icon'];?></option>
+									<?php endforeach;?>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div  class="form-group col-md-12">
+						<label for="description" class="control-label">Description</label>
+						<textarea class="form-control" type="text" name="description" id="description"><?php echo $row['description'];?></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div> <!-- /modal-body -->    
+    <div class="modal-footer">
+		<button type="submit" class="btn btn-success"><i class="ace-icon fa fa-check"></i>Save</button>
+        <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="ace-icon fa fa-times"></i>Cancel</button> 
+    </div>
+</form>
+<script>
+$(function(){
+	$('select#group').on('change',function(){
+		$.post(
+			"<?php echo $this->url('flow', array('action' => 'geticongroupchange'));?>",
+			{
+				group: $(this).val(),
+			},
+			function(data){
+				$('select#icon').html(data.icon);
+				$('select#icon').trigger('chosen:updated');
+			},
+			'json'
+		);
+	});
+	const fv = FormValidation.formValidation(document.getElementById('#form'), {
+        fields: {
+            action: {
+				validators: {
+					notEmpty: {
+						message: 'Please provide flow action.'
+					}
+				}
+			},
+			status: {
+				validators: {
+					notEmpty: {
+						message: 'Please select status.'
+					}
+				}
+			},
+			'class[]': {
+				validators: {
+					choice: {
+						min: 0,
+						max: 10,
+						message: 'Please choose 0 - 10 btn-class.',
+					},
+				}
+			},
+			group: {
+				validators: {
+					notEmpty: {
+						message: 'Please select icon group.'
+					}
+				}
+			},
+			icon: {
+				validators: {
+					notEmpty: {
+						message: 'Please select button icon.'
+					}
+				}
+			},
+        },
+        plugins: {
+            trigger: new FormValidation.plugins.Trigger(),
+            bootstrap3: new FormValidation.plugins.Bootstrap3(),
+            submitButton: new FormValidation.plugins.SubmitButton(),
+            defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+        },
+    }).on('core.element.validated', function (e) {
+		if (e.valid) {
+			$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-invalid');
+			$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-valid');
+		} else {
+			$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-valid');
+			$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-invalid');
+		}
+	});
+	$('form select').chosen().change(function () {
+		fv.revalidateField($(this).attr('name'));
+	});
+});
+</script>

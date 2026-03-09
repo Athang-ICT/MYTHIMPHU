@@ -1,0 +1,51 @@
+<?php
+/**
+ * View -- of Acl/ButtonController/indexAction
+ * chophel@athang.com
+ */
+	$this->headTitle($title);
+?>
+<div class="row">
+	<div class="col-lg-1"></div>
+	<div class="col-lg-10 sub-dashboard-menu">
+		<?php foreach($this->menu_helper(3) as $menu):?>
+			<?php  extract($menu); ?>
+			<h3 class="page-header">
+				<i class="menu-icon <?php echo $icon; ?>"></i>
+				<span class="menu-text"> <?php echo $menu; ?> </span>
+			</h3> 
+			<?php foreach ($menuItems as $key=>$menuitem): ?>
+				<?php extract($menuitem); ?>		                     
+				<?php if(!is_array($submenuItems)):?>
+					<div class="row sub-dashboard-item" data-url="<?php echo $this->url($route); ?>" title="<?php echo $menu; ?>">
+						<div class="col-lg-8">
+							<h4><?php echo $menu; ?></h4>
+							<p class="text-muted"><?php echo $description;?></p>
+						</div>
+						<div class="col-lg-4">
+						</div>
+					</div>
+				<?php else: ?>							
+					<?php foreach ($submenuItems as $submenuItem):?>
+						<div class="row sub-dashboard-item" data-url="<?php echo $this->url($route, array('action' => $submenuItem['action'])); ?>" >
+							<div class="col-lg-8">
+								<h4><?php echo $submenuItem['menu']; ?></h4>
+								<p class="text-muted"><?php echo $submenuItem['description'];?></p>
+							</div>
+							<div class="col-lg-4">
+							</div>
+						</div>
+					<?php endforeach;?>
+				<?php endif; ?>   
+			<?php endforeach;?>  			
+		<?php  endforeach; ?>
+	</div>	
+	<div class="col-lg-1"></div>
+</div>
+<script>
+	$('.sub-dashboard-item').each(function(){
+		$(this).bind('click',function(){
+			location.href=$(this).attr('data-url');
+		});
+	});
+</script>

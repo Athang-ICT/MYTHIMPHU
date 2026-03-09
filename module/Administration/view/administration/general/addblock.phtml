@@ -1,0 +1,111 @@
+<?php 
+/**
+ * View -- of Administration/MasterController/addblock
+ * chophel@athang.com
+ */
+$this->headTitle($this->title);
+?>
+<form id="#form" method="post" action="<?php echo $this->url('general', array('action' => 'addblock','id'=>$page)); ?>"  enctype="multipart/form-data" >                  
+    <div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h4 class="modal-title"> <i class="ace-icon fa fa-plus-square-o"></i> <?php echo $this->title; ?></h4>
+    </div>  <!-- /modal-header -->
+    <div class="modal-body">  
+		<div class="panel panel-default">
+			<div class="panel-body"> 
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="form-group">  
+							<label class="control-label" for="district">Dzongkhag</label>
+							<select id="district" name="district" class="form-control" data-placeholder="Select">
+								<option value=""></option>
+								<?php foreach($districts as $district):?>
+									<option value="<?php echo $district['id']?>">
+										<?php echo $district['district'];?></option>
+								<?php endforeach;?>
+							</select>
+						</div>
+						<div class="form-group"> 
+							<label class="control-label" for="block">Block Name En</label>
+							<input type="text" class="form-control" name="block" id="block" placeholder="Block Name En" required /> 
+						</div>
+						<div class="form-group"> 
+							<label class="control-label" for="blockDz">Block Name Dz</label>
+							<input type="text" class="form-control" name="blockDz" id="blockDz" placeholder="Block Name Dz" required /> 
+						</div>
+						<div  class="form-group">
+							<label for="status" class="control-label">Status</label>
+							<div class="radio">
+								<label>
+									<input class="ace" type="radio" name="status" id="status" value="1" checked />
+									<span class="lbl"> Yes </span>
+								</label>
+								<label>
+									<input class="ace" type="radio" name="status" id="status" value="0" />
+									<span class="lbl"> No </span>
+								</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div> <!-- /modal-body -->    
+    <div class="modal-footer">
+		<button type="submit" class="btn btn-success"><i class="ace-icon fa fa-check"></i>Save</button>
+        <button type="button" class="btn btn-warning" data-dismiss="modal"><i class="ace-icon fa fa-times"></i>Cancel</button> 
+    </div>
+</form>
+<script>
+$(function(){
+	const fv = FormValidation.formValidation(document.getElementById('#form'), {
+		fields: {
+			district: {
+				validators: {
+					notEmpty: {
+						message: 'Please select District.'
+					}
+				}
+			},
+			block: {
+				validators: {
+					notEmpty: {
+						message: 'Please provide Block Name En.'
+					}
+				}
+			},
+			blockDz: {
+				validators: {
+					notEmpty: {
+						message: 'Please provide Block Name Dz.'
+					}
+				}
+			},
+			status: {
+				validators: {
+					notEmpty: {
+						message: 'Please select status.'
+					}
+				}
+			},
+		},
+		plugins: {
+			trigger: new FormValidation.plugins.Trigger(),
+			bootstrap3: new FormValidation.plugins.Bootstrap3(),
+			submitButton: new FormValidation.plugins.SubmitButton(),
+			defaultSubmit: new FormValidation.plugins.DefaultSubmit(),
+		},
+	}).on('core.element.validated', function (e) {
+		if (e.valid) {
+			$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-invalid');
+			$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-valid');
+		} else {
+			$('div#'+ e.field.replace('[]','') +'_chosen').removeClass('is-valid');
+			$('div#'+ e.field.replace('[]','') +'_chosen').addClass('is-invalid');
+		}
+	});
+	$('form select').chosen().change(function () {
+		fv.revalidateField($(this).attr('name'));
+	});
+});
+</script>

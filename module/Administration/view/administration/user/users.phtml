@@ -1,0 +1,62 @@
+<?php 
+/**
+ * View -- of Administration/UserController/usersAction
+ * chophel@athang.com -- 2022
+ */
+	$this->headTitle($this->title);
+?>
+<?php echo $this->tabs_helper(array(402)); ?>
+<div class="card">
+	<div class="card-header">
+		<div class="btn-group pull-right">
+			<?php echo $this->button(2);?>
+		</div>
+	</div>
+	<div class="table-responsive">
+		<table class="table card-table text-nowrap" id="dataTables">
+			<thead>
+				<tr>
+					<th >#</th>
+					<th>Name</th>
+					<th>CID</th>
+					<th>Email</th>
+					<th>Mobile</th>
+					<th>Location</th>
+					<th>Status</th>
+					<?php if($this->button(1)!=""):?>
+						<th class="no-print">Action</th>
+					<?php endif; ?>
+				</tr>
+			</thead>
+			<tbody>
+			<?php $i=1; foreach ($userlists as $row):?>
+				<tr data-href="<?php echo $this->button(4,$row['id']); ?>">
+					<td><?php echo $i++; ?> </td>
+					<td><?php echo $row['name']; ?></td>
+					<td><?php echo $row['cid']; ?></td>
+					<td><?php echo $row['email']; ?></td>
+					<td><?php echo $row['mobile']; ?></td>
+					<td><?php echo $this->locationObj->getColumn($row['location'],'location'); ?></td>
+					<td><?php echo $this->status($row['status']); ?></td>
+					<?php if($this->button(1)!=""):?>
+						<td><?php echo $this->button(1,$row['id']);?></td>
+					<?php endif;?>
+				</tr>
+			<?php endforeach;?>
+			</tbody>
+		</table>
+	</div>
+</div>
+<script>
+	$("tr[data-href]").each(function(){
+		$(this).find('td').not('td.action').each(function(){
+			$(this).css('cursor','pointer');
+			$(this).bind('click',function() {
+				window.document.location = $(this).closest('tr').attr("data-href");
+			});
+		});
+	});
+	$('document').ready(function(){
+		$('#dataTables').DataTable({"paging":   true,});
+	});
+</script>

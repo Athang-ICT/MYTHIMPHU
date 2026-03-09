@@ -1,0 +1,95 @@
+<?php
+/**
+ * Layout --- Top Navbar
+ * singye@athang.com
+ */
+?>
+<?php if($this->identity()): $user = $this->identity(); endif; ?>
+<div id="navbar" class="navbar navbar-default          ace-save-state navbar-fixed-top">
+	<div class="navbar-container ace-save-state" id="navbar-container">
+		<button type="button" class="navbar-toggle menu-toggler pull-left" id="menu-toggler" data-target="#sidebar">
+			<span class="sr-only">Toggle sidebar</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		</button>
+		<div class="navbar-header pull-left">
+			<a href="<?php echo $this->url('application', array('action'=>'panel1'));?>" class="navbar-brand">
+				<small>
+					<img style="margin-top:-11px; margin-bottom:-9px; height:40px" src="<?php //echo $this->basePath() . '/images/logo-nav.png' ?> "/>
+					MY THIMPHU
+				</small>
+			</a>
+		</div>
+		<div class="navbar-buttons navbar-header pull-right" role="navigation">
+		<?php $notificationResult = $this->notification($user->id);
+			foreach($notificationResult as $notifycount);?>
+			<ul class="nav ace-nav">
+				<li class="purple dropdown-modal">
+					<a data-toggle="dropdown" class="dropdown-toggle" href="#">
+						<i class="ace-icon fa fa-bell icon-animated-bell"></i>
+						<span class="badge badge-important"><?php echo (sizeof($notificationResult)>0)?$notifycount['count']:'';?></span>
+					</a>
+					<ul class="dropdown-menu-right dropdown-navbar navbar-pink dropdown-menu dropdown-caret dropdown-close">
+						<li class="dropdown-header">
+							<i class="ace-icon fa fa-exclamation-triangle"></i>
+							<?php echo $count = count($notificationResult); ?> &nbsp;
+							<?php echo ($count > 1)?"Notifications":"Notification"; ?> 							
+						</li>
+						<li class="dropdown-content">
+							<ul class="dropdown-menu dropdown-navbar navbar-pink">
+								<?php foreach($notificationResult as $notify): ?>
+							     <li>
+									<a href="<?php echo $this->url($notify['route'], array('action'=>$notify['action'], 'id'=>$notify['key'].'-1-'.$notify['id']));?>">
+										<div class="clearfix">
+											<span class="pull-left">
+												<i class="btn btn-xs no-hover btn-pink fa fa-user"></i>
+												<?php echo $notify['desc']; ?>
+											</span>											
+										</div>
+									</a>
+								 </li>
+							    <?php endforeach; ?>								
+							</ul>
+						</li>
+						<li class="dropdown-footer">
+							<a href="<?php echo $this->url('application', array('action'=>'allnotification'));?>">
+								See all notifications
+								<i class="ace-icon fa fa-arrow-right"></i>
+							</a>
+						</li>
+					</ul>
+				</li>
+				
+				<li class="light-blue dropdown-modal">
+					<a data-toggle="dropdown" href="#" class="dropdown-toggle">
+                        <img class="nav-user-photo" src="<?php echo ($user->photo=='0')?$this->basePath() . '/images/avatar.jpg':$this->basePath() . '/uploads/user/'.$user->photo;?>" alt="<?php echo strstr($user->name, ' ', true);?>" />
+						<span class="user-info">
+							<small>Welcome,</small>
+							<?php echo !empty($user->name) ? explode(' ',trim($user->name))[0] : '';?>
+						</span>
+						<i class="ace-icon fa fa-caret-down"></i>
+					</a>
+					<ul class="user-menu dropdown-menu-right dropdown-menu dropdown-yellow dropdown-caret dropdown-close">
+						<li>
+							<a href="<?php echo $this->url('user', array('action'=>'view', 'id'=>$user->id));?>">
+								<i class="ace-icon fa fa-user"></i>
+								Profile
+							</a>
+						</li>
+						<li class="divider"></li>
+						<li>
+							<a href="<?php echo $this->url('auth', array('action' => 'logout'));?>"><i class="fa fa-power-off fa-fw"></i> Logout</a>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</div>
+	</div><!-- /.navbar-container -->
+</div>
+<div id="modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+		</div>
+	</div>
+</div>
